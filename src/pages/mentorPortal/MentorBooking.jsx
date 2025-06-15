@@ -1,6 +1,6 @@
 import React from 'react'
 
-function BookingFunctionality() {
+function MentorBooking() {
   return (
     <div>
       
@@ -8,4 +8,5 @@ function BookingFunctionality() {
   )
 }
 
-export default BookingFunctionality
+export default MentorBooking
+

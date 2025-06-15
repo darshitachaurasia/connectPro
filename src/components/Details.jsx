@@ -1,6 +1,6 @@
 import React from 'react'
 
-function BookingFunctionality() {
+function Details() {
   return (
     <div>
       
@@ -8,4 +8,4 @@ function BookingFunctionality() {
   )
 }
 
-export default BookingFunctionality
+export default Details

@@ -12,17 +12,35 @@ const adminSlice = createSlice({
     name : 'admin',
     initialState,
     reducers : {
-        fet: (state, action) => {
-            state.status = true;
-            state.userData = action.payload;
+        fetchAllUsers: (state, action) => {
+            state.user = action.payload;  
+            state.loading = false;
         },
-        logout : (state) => {
-            state.status = false;
-            state.userData = null;
+        fetchAllMentors : (state,action) => {
+            state.mentor = action.payload; 
+            state.loading = false
+        },
+        getPlatformStats: (state,action)=> { 
+            state.stats = action.payload
+            state.loading = false
+        },
+        deleteUser : (state,action) => {
+            state.user = state.user.filter(user => user.id !== action.payload);
+            state.loading = false;
+        },
+        approveMentor : (state,action) => {
+            const mentorIndex = state.mentor.findIndex(mentor => mentor.id === action.payload.id);
+            if (mentorIndex !== -1) {
+                state.mentor[mentorIndex] = {...state.mentor[mentorIndex], ...action.payload};
+            }
+            state.loading = false;
+        },
+        setLoading : (state,action) => {
+            state.loading = action.payload;
         }
     }
 })
 
-export const {login, logout} = adminSlice.actions;
+export const {fetchAllUsers,fetchAllMentors,getPlatformStats,deleteUser,approveMentor} = adminSlice.actions;
 
 export default adminSlice.reducer;
