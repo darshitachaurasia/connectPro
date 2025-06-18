@@ -1,66 +1,97 @@
-import conf from "./conf"
-import { Client, Account, ID } from "appwrite";
+import conf from "./conf";
+import { Client, Account, ID, Databases } from "appwrite";
 
-export class AuthService { //using class to create a proper , reusable , singular and organised structure 
-    client = new Client(); // Initialize the Appwrite client
-    account; // will later be assigned to a new Account instance
-    constructor() { // constructor runs when an object of AuthService is created
-        this.client
-          .setEndpoint(conf.appwriteUrl)
-          .setProject(conf.appwriteProjectId);
-        this.account = new Account(this.client);// creates an account instance using the client
-    }
+export class AuthService {
+  client = new Client();
+  account;
+  databases;
 
+  constructor() {
+    this.client
+      .setEndpoint(conf.appwriteUrl)
+      .setProject(conf.appwriteProjectId);
 
-async createAccount({email,password,name}){
-    try{
-    const userAccount = await this.account.create(
-    ID.unique(),
-    email,
-    password,
-    name
-);
-    if(userAccount){
-        return this.login({email,password})
-    }else{
-        return userAccount;
+    this.account = new Account(this.client);
+    this.databases = new Databases(this.client);
+  }
+
+  // ✅ Account Creation + DB Profile with Role
+  async createAccount({ email, password, name, role }) {
+    try {
+      // Step 1: Create auth account
+      const userAccount = await this.account.create(
+        ID.unique(),
+        email,
+        password,
+        name
+      );
+
+      // Step 2: Automatically log them in
+      if (!userAccount) return null;
+      await this.login({ email, password });
+
+      // Step 3: Get current user details to store in DB
+      const user = await this.account.get();
+
+      // Step 4: Store user profile (with role) in DB
+      await this.databases.createDocument(
+        conf.appwritedatabaseId,
+        conf.appwriteUsersCollectionId,
+        user.$id,
+        {
+          name,
+          email,
+          role,
+          userId: user.$id,
         }
+      );
+
+      return userAccount;
+    } catch (error) {
+      console.log("Appwrite service :: createAccount :: error", error);
+      throw error;
     }
-    catch(error){
-        console.log("Appwrite service :: createAccount :: error", error);
+  }
+
+  // ✅ Login
+  async login({ email, password }) {
+    try {
+      return await this.account.createEmailPasswordSession(email, password);
+    } catch (error) {
+      console.log("Appwrite service :: login :: error", error);
+      throw error;
     }
+  }
+
+  // ✅ Get Auth User + Role from DB
+  async getCurrentUser() {
+    try {
+      const user = await this.account.get();
+      if (!user || !user.$id) return null;
+
+      const profile = await this.databases.getDocument(
+        conf.appwritedatabaseId,
+        conf.appwriteUsersCollectionId,
+        user.$id
+      );
+
+      return { ...user, role: profile?.role || "user" };
+    } catch (error) {
+      console.log("Appwrite service :: getCurrentUser :: error", error);
+      return null;
+    }
+  }
+
+  // ✅ Logout
+  async logout() {
+    try {
+      await this.account.deleteSessions();
+    } catch (error) {
+      console.log("Appwrite service :: logout :: error", error);
+      throw error;
+    }
+  }
 }
 
-async login({email,password}){
-    try{
-        return await this.account.createEmailPasswordSession(email, password);
-    }
-    catch (error){
-        console.log("Appwrite service :: login :: error", error);
-    }
-}
-
-async getCurrentUser(){
-    try{
-    
-       return await this.account.get();
-
-    }catch(error){
-       console.log("Appwrite service :: getCurrentUser :: error", error);
-    }
-
-    return null;
-}
-
-async logout(){
-    try{
-    await this.account.deleteSessions()
-    }catch(error){
-        console.log("Appwrite service :: logout :: error", error);
-    }
-}
-}
-
-const authService = new AuthService(); // as class is not usable  directly , we create an instance/ object  of that class 
-
+const authService = new AuthService();
 export default authService;

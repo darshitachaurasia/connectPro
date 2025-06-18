@@ -57,26 +57,26 @@ export class Service{
 
     // Mentor Profile
 
-
-    async createMentorProfile({userId,services,availavleSlots,bio,experience,slug}){
-      try{
-        return await this.databases.createDocument(
-          conf.appwritedatabaseId,
-          conf.appwritementorsCollectionId,
-          slug,
-          userId,
-          {   
-            services,
-            availavleSlots,
-            bio,
-            experience
-          }
-        )
-      }catch(error){
-          console.log("Appwrite service :: createMentorProfile :: error", error);
+async createMentorProfile({userId, services, availableSlots, bio, experience, slug}) {
+  try {
+    return await this.databases.createDocument(
+      conf.appwritedatabaseId,
+      conf.appwritementorsCollectionId,
+      slug,
+      {
+        userId,
+        services,
+        availableSlots, // typo fixed
+        bio,
+        experience,
       }
+    );
+  } catch (error) {
+    console.log("Appwrite service :: createMentorProfile :: error", error);
   }
-  async getMentorBYProfile(userId){
+}
+
+  async getMentorByProfile(userId){
     try{
       return await this.databases.getDocument(
         conf.appwritedatabaseId,
@@ -108,6 +108,43 @@ async updateMentorsProfile({userId,updatedData}){
     )
   }catch(error){
       console.log("Appwrite service :: updateUserProfile :: error", error);
+  }
+}
+//admin
+async listAllUsers() {
+  try {
+    return await this.databases.listDocuments(
+      conf.appwritedatabaseId,
+      conf.appwriteUsersCollectionId
+    );
+  } catch (error) {
+    console.log("Appwrite service :: listAllUsers :: error", error);
+  }
+}
+
+async listAllBookings() {
+  try {
+    return await this.databases.listDocuments(
+      conf.appwritedatabaseId,
+      conf.appwritebookingCollectionId
+    );
+  } catch (error) {
+    console.log("Appwrite service :: listAllBookings :: error", error);
+  }
+}
+async getCounts() {
+  try {
+    const users = await this.listAllUsers();
+    const mentors = await this.listMentors();
+    const bookings = await this.listAllBookings();
+
+    return {
+      userCount: users.total,
+      mentorCount: mentors.total,
+      bookingCount: bookings.total,
+    };
+  } catch (error) {
+    console.log("Appwrite service :: getCounts :: error", error);
   }
 }
 
@@ -208,12 +245,12 @@ async listBookingsByMentor(mentorId){
     }
 
   
-getFilePreview(fileId){
-    return this.bucket.getFilePreview(
-      conf.appwritebucketId,
-      fileId);
-      
-} 
+getFilePreview(fileId) {
+  return fileId
+    ? this.bucket.getFilePreview(conf.appwritebucketId, fileId)
+    : null;
+}
+
 }
 
 const service = new Service();

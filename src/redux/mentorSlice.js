@@ -7,7 +7,7 @@ const initialState = {
    loading: false
 }
 
-const userSlice = createSlice({
+const mentorSlice = createSlice({
     name : 'mentor',
     initialState,
     reducers : {
@@ -38,6 +38,6 @@ const userSlice = createSlice({
     }
 })
 
-export const {fetchAllMentors,fetchMentorById,updateMentorProfile,setAvailableSlots,setLoading} = userSlice.actions;
+export const {fetchAllMentors,fetchMentorById,updateMentorProfile,setAvailableSlots,setLoading} = mentorSlice.actions;
 
-export default userSlice.reducer;
+export default mentorSlice.reducer;

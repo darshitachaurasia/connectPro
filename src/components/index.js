@@ -2,23 +2,27 @@ import Details from './Details'
 import Header from './Header'
 import Logo from './Logo'
 import LogoutBtn from './LogoutBtn'
-import Footer from './Footer'
+
 import Login from './Login'
-import Signup from './Signup'
+import SignUp from './SignUp'
 import AuthLayout from './AuthLayout'
 import Input from './Input'
 import Button from './Button'
+import ProfilePage from './ProfilePage'
+import MentorCard from './MentorCard'
 
 export {
     Details,
     Header,
     Logo,
     LogoutBtn,
-    Footer,
+   
     Login,
-    Signup,
+    SignUp,
     AuthLayout,
+    ProfilePage,
     Input,
-    Button
+    Button,
+    MentorCard
     
 }
