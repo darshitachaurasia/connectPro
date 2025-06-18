@@ -11,21 +11,19 @@ function SideBar() {
 
   // 🧭 Add paths for each page
   const pages = {
-    seeker: [  
-      { name: 'User Login', path: '/user-login' },
-      { name: 'User SignUp', path: '/user-signup' },
+    general: [  
+      { name: 'SignUp', path: '/user-signup' },
       { name: 'User Profile', path: '/profile' },
       { name: 'Mentors Listing', path: '/mentors' },
-      { name: 'Services', path: '/booking' },
+      { name: 'Services', path: '/service' },
       { name: 'Booking Details', path: '/booking-details' },
     ],
     expert: [
-      { name: 'Login Page', path: '/mentor-login' },
+     
       { name: 'Mentor Profile', path: '/mentor-profile' },
       { name: 'Booking Details', path: '/mentor-bookings' },
     ],
     admin: [
-      { name: 'Login Page', path: '/admin-login' },
       { name: 'Analytics Page', path: '/admin-analytics' },
       { name: 'User Management', path: '/manage-users' },
       { name: 'Mentor Management', path: '/manage-mentors' },

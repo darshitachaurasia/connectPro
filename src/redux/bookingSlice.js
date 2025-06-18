@@ -32,6 +32,14 @@ const bookingSlice = createSlice({
             }
             state.loading = false;
         },
+        acceptUserBooking: (state,action)=> {
+            const { bookingId } = action.payload;
+            const bookingIndex = state.bookings.findIndex(booking => booking.id === bookingId);
+            if (bookingIndex !== -1) {
+                state.bookings[bookingIndex].status = 'accepted';
+            }
+            state.loading = false;
+        },
         setLoading: (state, action) => {
             state.loading = action.payload;
         },

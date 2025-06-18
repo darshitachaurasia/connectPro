@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   profile: null,
   loading: false,
-  role: null, // 👈 new
+  role: null, 
 };
 
 const authSlice = createSlice({
@@ -12,7 +12,7 @@ const authSlice = createSlice({
   reducers: {
     login: (state, action) => {
       state.profile = action.payload;
-      state.role = action.payload.role || 'user'; // 👈 role from payload
+      state.role = action.payload.role || 'user';
       state.loading = false;
     },
     logout: (state) => {

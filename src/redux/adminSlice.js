@@ -41,6 +41,6 @@ const adminSlice = createSlice({
     }
 })
 
-export const {fetchAllUsers,fetchAllMentors,getPlatformStats,deleteUser,approveMentor} = adminSlice.actions;
+export const {fetchAllUsers,fetchAllMentors,getPlatformStats,deleteUser,approveMentor,setLoading} = adminSlice.actions;
 
 export default adminSlice.reducer;

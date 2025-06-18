@@ -16,7 +16,7 @@ const mentorSlice = createSlice({
             state.selectedMentor = null;
             state.loading = false;
         },
-        fetchMentorById : (state,action) => {
+        fetchMentorProfile : (state,action) => {
             state.mentors = action.payload;
             state.selectedMentor = action.payload;
             state.loading = false;

@@ -21,13 +21,13 @@ function Header() {
       active: !authStatus,
   },
   {
-      name: "Signup",
+      name: "SignUp",
       slug: "/signup",
       active: !authStatus,
   },
   {
       name: 'Services',
-      slug: "/services",
+      slug: "/service",
       active: true
     }, 
 

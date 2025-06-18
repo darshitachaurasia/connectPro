@@ -14,20 +14,23 @@ import UserProfile from './pages/generalportal/UserProfile.jsx';
 import ServicesPage from './pages/generalportal/ServicesPage.jsx';
 import BookingDetails from './pages/generalportal/BookingDetails.jsx';
 import MentorListing from './pages/generalportal/MentorListing.jsx';
-import UserLogin from './pages/generalportal/UserLogin.jsx';
+import UserLogin from './pages/generalportal/UserDashboard.jsx';
 import UserSignUp from './pages/generalportal/UserSignUp.jsx';
 
-import MentorLogin from './pages/mentorPortal/MentorLogin.jsx';
+import MentorLogin from './pages/mentorPortal/MentorDashboard.jsx';
 import MentorProfilePage from './pages/mentorPortal/MentorProfilePage.jsx';
 
 import MentorBooking from './pages/mentorPortal/MentorBooking.jsx';
 
-import AdminLogin from './pages/adminPortal/AdminLogin.jsx';
+import AdminLogin from './pages/adminPortal/AdminDashboard.jsx';
 import AnalyticsPage from './pages/adminPortal/AnalyticsPage.jsx';
 import UserManagementPage from './pages/adminPortal/UserManagementPage.jsx';
 import MentorManagement from './pages/adminPortal/MentorManagement.jsx';
 
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import UserDashboard from './pages/generalportal/UserDashboard.jsx';
+import MentorDashboard from './pages/mentorPortal/MentorDashboard.jsx';
+import AdminDashboard from './pages/adminPortal/AdminDashboard.jsx';
 
 
 const router = createBrowserRouter([
@@ -53,12 +56,12 @@ const router = createBrowserRouter([
           </AuthLayout>
         ),
       },
-      { path: '/user-login', element: <UserLogin /> },
+      { path: '/user-login', element: <UserDashboard /> },
       { path: '/user-signup', element: <UserSignUp /> },
 
       // Open route
       { path: '/mentors', element: <MentorListing /> },
-      { path: '/booking', element: <ServicesPage /> },
+      { path: '/service', element: <ServicesPage /> },
 
       // Protected User Routes
       {
@@ -79,7 +82,7 @@ const router = createBrowserRouter([
       },
 
       // Mentor Portal
-      { path: '/mentor-login', element: <MentorLogin /> },
+      { path: '/mentor-login', element: <MentorDashboard /> },
       {
         path: '/mentor-profile',
         element: (
@@ -99,7 +102,7 @@ const router = createBrowserRouter([
       },
 
       // Admin Portal
-      { path: '/admin-login', element: <AdminLogin /> },
+      { path: '/admin-login', element: <AdminDashboard /> },
       {
         path: '/admin-analytics',
         element: (

@@ -12,28 +12,23 @@ function Login() {
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
 
-  const login = async (data) => {
-    setError("");
-    try {
-      const session = await authService.login({
-        email: data.email,
-        password: data.password,
-      });
-      console.log("Login session:", session);
-      if (session) {
-        const userData = await authService.getCurrentUser();
-        if (userData) {
-          dispatch(authLogin(userData));
-          if (userData.role === "admin") navigate("/admin-login");
-          else if (userData.role === "mentor") navigate("/mentor-login");
-          else if (userData.role === "user") navigate("/user-login");
-          else navigate("/");
+  const login = async(data) => {
+        setError("")
+        try {
+            const session = await authService.login(data)
+            if (session) {
+                const userData = await authService.getCurrentUser()
+                if(userData){ dispatch(authLogin(userData))
+                  if(userData.role === "admin"){navigate("/admin-login")}
+                  if(userData.role === "mentor"){navigate("/mentor-login")}
+                  if(userData.role === "admin"){navigate("/user-login")}
+                };
+                
+            }
+        } catch (error) {
+            setError(error.message)
         }
-      }
-    } catch (error) {
-      setError(error.message || "Login failed. Please try again.");
     }
-  };
 
   return (
     <div className="flex items-center justify-center w-full">
@@ -47,7 +42,7 @@ function Login() {
           Sign in to your account
         </h2>
         <p className="mt-2 text-center text-base text-black/60">
-          Don&apos;t have an account?&nbsp;
+          Don't have an account?
           <Link
             to="/signup"
             className="font-medium text-primary transition-all duration-200 hover:underline"

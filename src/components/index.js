@@ -1,4 +1,4 @@
-import Details from './Details'
+
 import Header from './Header'
 import Logo from './Logo'
 import LogoutBtn from './LogoutBtn'
@@ -12,7 +12,7 @@ import ProfilePage from './ProfilePage'
 import MentorCard from './MentorCard'
 
 export {
-    Details,
+   
     Header,
     Logo,
     LogoutBtn,
