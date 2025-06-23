@@ -1,36 +1,25 @@
-import { useState } from 'react';
-import authService from '../appwrite/auth';
-import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../redux/authSlice';
-import { Button, Input, Logo } from './index';
-import { useDispatch } from 'react-redux';
-import { useForm } from 'react-hook-form';
 
+import { Link, Navigate, useNavigate} from 'react-router-dom';
+import { Button, Input, Logo } from './index';
+import { useDispatch, useSelector } from 'react-redux';
+import { useForm } from 'react-hook-form';
+import { signUpUser } from '../redux/authSlice';
+import { useEffect } from 'react';
 function SignUp() {
-  const navigate = useNavigate();
-  const [error, setError] = useState('');
+  const { user, error, status } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const { register, handleSubmit } = useForm();
-
-  const create = async (data) => {
-    setError('');
-    try {
-      const session = await authService.createAccount(data);
-      if (session) {
-        const currentUser = await authService.getCurrentUser();
-        if (currentUser) {
-          dispatch(login(currentUser));
-          // ⏩ Role-based redirect
-          if (currentUser.role === "admin") navigate("/admin-login");
-          else if (currentUser.role === "mentor") navigate("/mentor-login");
-          else if (currentUser.role === "user") navigate("/user-login");
-          else navigate("/");
-        }
-      }
-    } catch (error) {
-      setError(error.message || "Signup failed");
+  const navigate = useNavigate();
+  const onSubmit = (data) => {
+      dispatch(signUpUser(data));
+    };
+useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') navigate('/admin-login');
+      else if (user.role === 'mentor') navigate('/mentor-login');
+      else navigate('/user-login');
     }
-  };
+  }, [user, navigate]);
 
   return (
     <div className="flex items-center justify-center">
@@ -54,7 +43,7 @@ function SignUp() {
         </p>
         {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
 
-        <form onSubmit={handleSubmit(create)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-5">
             <Input
               label="Full Name:"
@@ -94,8 +83,8 @@ function SignUp() {
               <option value="admin">Admin</option>
             </select>
 
-            <Button type="submit" className="w-full">
-              Create Account
+            <Button type="submit" className="w-full" disabled={status === 'loading'}>
+              {status === 'loading' ? 'Creating...' : 'Create Account'}
             </Button>
           </div>
         </form>

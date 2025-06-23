@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useForm } from 'react-hook-form';
 import service from '../../appwrite/services';
-import { login } from '../../redux/authSlice';
+
+import { Input, Button } from '../../components'; // Adjust path if needed
 
 function UserProfilePage() {
-  const dispatch = useDispatch();
-  const auth = useSelector((state) => state.auth.profile);
+  const auth = useSelector((state) => state.auth.user);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    role: '',
-    bio: '',
-  });
-
+  const [updateMessage, setUpdateMessage] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,109 +23,86 @@ function UserProfilePage() {
 
       try {
         const profile = await service.getUserProfile(auth.$id);
-        setFormData({
+        reset({
           name: profile.name || '',
           email: profile.email || '',
           role: profile.role || 'user',
           bio: profile.bio || '',
         });
-        setLoading(false);
       } catch (err) {
         console.log('Failed to fetch user profile:', err);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchUserProfile();
-  }, [auth]);
+  }, [auth, reset]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!auth?.$id) return;
-
+  const onSubmit = async (data) => {
+    setUpdateMessage('');
     try {
       const updated = await service.updateUserProfile({
         userId: auth.$id,
-        updatedData: formData,
-      });if(updated)
-      {
-      dispatch(login({ ...auth, ...formData }));
-      alert('Profile updated successfully!'
+        updatedData: data,
+      });
 
-      );}
+      if (updated) {
+        setUpdateMessage('✅ Profile updated successfully!');
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
+      setUpdateMessage('❌ Failed to update profile.');
     }
   };
 
-  if (loading) return <p className="p-4">Loading profile...</p>;
+  if (loading) return <p className="text-center p-4">Loading profile...</p>;
 
   return (
     <div className="max-w-xl mx-auto mt-10 p-6 bg-white shadow-md rounded-md">
-      <h2 className="text-2xl font-semibold mb-4">My Profile</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-medium mb-1">Name</label>
-          <input
-            type="text"
-            name="name"
-            className="w-full border px-3 py-2 rounded"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+      <h2 className="text-2xl font-semibold mb-4 text-center">My Profile</h2>
+      {updateMessage && (
+        <p className="text-center text-sm text-green-600 mb-4">
+          {updateMessage}
+        </p>
+      )}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <Input
+          label="Full Name:"
+          placeholder="Enter your full name"
+          {...register('name', { required: 'Name is required' })}
+        />
+        {errors.name && <p className="text-red-600 text-sm">{errors.name.message}</p>}
+
+        <Input
+          label="Email:"
+          type="email"
+          readOnly
+          {...register('email')}
+        />
+
+        <Input
+          label="Role:"
+          readOnly
+          {...register('role')}
+        />
 
         <div>
-          <label className="block font-medium mb-1">Email</label>
-          <input
-            type="email"
-            name="email"
-            className="w-full border px-3 py-2 rounded"
-            value={formData.email}
-            readOnly
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Role</label>
-          <input
-            type="text"
-            name="role"
-            className="w-full border px-3 py-2 rounded"
-            value={formData.role}
-            readOnly
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Bio</label>
+          <label className="block font-medium mb-1">Bio:</label>
           <textarea
-            name="bio"
+            {...register('bio')}
+            rows={4}
             className="w-full border px-3 py-2 rounded"
-            value={formData.bio}
-            onChange={handleChange}
-            rows={3}
+            placeholder="Tell us something about yourself..."
           />
         </div>
 
-        <button
-          type="submit"
-          className="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-800"
-        >
-          Update Profile
-        </button>
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? 'Updating...' : 'Update Profile'}
+        </Button>
       </form>
     </div>
   );
 }
 
 export default UserProfilePage;
-

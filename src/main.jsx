@@ -6,7 +6,7 @@ import './index.css';
 import { Provider } from 'react-redux';
 import store from './redux/store.js';
 
-import { AuthLayout, Login, SignUp } from './components/index.js';
+import { Login, SignUp } from './components/index.js';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import LandingPage from './pages/generalportal/LandingPage.jsx';
@@ -14,15 +14,11 @@ import UserProfile from './pages/generalportal/UserProfile.jsx';
 import ServicesPage from './pages/generalportal/ServicesPage.jsx';
 import BookingDetails from './pages/generalportal/BookingDetails.jsx';
 import MentorListing from './pages/generalportal/MentorListing.jsx';
-import UserLogin from './pages/generalportal/UserDashboard.jsx';
 import UserSignUp from './pages/generalportal/UserSignUp.jsx';
 
-import MentorLogin from './pages/mentorPortal/MentorDashboard.jsx';
 import MentorProfilePage from './pages/mentorPortal/MentorProfilePage.jsx';
-
 import MentorBooking from './pages/mentorPortal/MentorBooking.jsx';
 
-import AdminLogin from './pages/adminPortal/AdminDashboard.jsx';
 import AnalyticsPage from './pages/adminPortal/AnalyticsPage.jsx';
 import UserManagementPage from './pages/adminPortal/UserManagementPage.jsx';
 import MentorManagement from './pages/adminPortal/MentorManagement.jsx';
@@ -32,38 +28,33 @@ import UserDashboard from './pages/generalportal/UserDashboard.jsx';
 import MentorDashboard from './pages/mentorPortal/MentorDashboard.jsx';
 import AdminDashboard from './pages/adminPortal/AdminDashboard.jsx';
 
+import AuthLayout from './components/AuthLayout.jsx';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
-      // General Portal
       { path: '/', element: <LandingPage /> },
-      {
-        path: '/login',
-        element: (
-          <AuthLayout authentication={false}>
-            <Login />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: '/signup',
-        element: (
-          <AuthLayout authentication={false}>
-            <SignUp />
-          </AuthLayout>
-        ),
-      },
-      { path: '/user-login', element: <UserDashboard /> },
+
+      // Public Auth Routes
+      { path: '/login', element: <Login /> },
+      { path: '/signup', element: <SignUp /> },
       { path: '/user-signup', element: <UserSignUp /> },
 
-      // Open route
+      // Mentor listing and services are open to all
       { path: '/mentors', element: <MentorListing /> },
       { path: '/service', element: <ServicesPage /> },
 
-      // Protected User Routes
+      // User Auth Routes
+      {
+        path: '/user-login',
+        element: (
+          <ProtectedRoute allowedRoles={['user']}>
+            <UserDashboard />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: '/profile',
         element: (
@@ -82,7 +73,14 @@ const router = createBrowserRouter([
       },
 
       // Mentor Portal
-      { path: '/mentor-login', element: <MentorDashboard /> },
+      {
+        path: '/mentor-login',
+        element: (
+          <ProtectedRoute allowedRoles={['mentor']}>
+            <MentorDashboard />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: '/mentor-profile',
         element: (
@@ -91,7 +89,6 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      
       {
         path: '/mentor-bookings',
         element: (
@@ -102,7 +99,14 @@ const router = createBrowserRouter([
       },
 
       // Admin Portal
-      { path: '/admin-login', element: <AdminDashboard /> },
+      {
+        path: '/admin-login',
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: '/admin-analytics',
         element: (
@@ -128,9 +132,9 @@ const router = createBrowserRouter([
         ),
       },
 
-      // Optional fallback
+      // Unauthorized
       {
-        path: '/unauthorized',
+        path: '/',
         element: <div className="text-center p-10">⛔ Unauthorized Access</div>,
       },
     ],
@@ -140,7 +144,10 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <AuthLayout>
+        <RouterProvider router={router} />
+      </AuthLayout>
     </Provider>
   </React.StrictMode>
 );
+

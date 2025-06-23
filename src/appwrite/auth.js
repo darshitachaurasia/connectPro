@@ -1,5 +1,5 @@
 import conf from "./conf";
-import { Client, Account, ID, Databases } from "appwrite";
+import { Client, Account, ID, Databases ,Query,Permission,Role} from "appwrite";
 
 export class AuthService {
   client = new Client();
@@ -16,7 +16,7 @@ export class AuthService {
   }
 
   // ✅ Create Account + Add Profile to DB with Role
-  async createAccount({ email, password, name, role }) {
+  async signUp({ email, password, name, role, profileImage, bio }) {
     try {
       // Step 1: Create Appwrite account
       const userAccount = await this.account.create(
@@ -26,28 +26,27 @@ export class AuthService {
         name
       );
 
-      if (!userAccount) return null;
-
-      // Step 2: Log the user in
-      await this.login({ email, password });
-
-      // Step 3: Get user details
-      const user = await this.account.get();
-
       // Step 4: Store user profile in DB with role
       await this.databases.createDocument(
         conf.appwriteDatabaseId,
         conf.appwriteUsersCollectionId,
-        user.$id,
+        userAccount.$id,
         {
           name,
           email,
           role,
-          userId: user.$id,
-        }
+          userId: userAccount.$id,
+           profileImage, 
+           bio
+        },
+  [
+    Permission.read(Role.user(userAccount.$id)),
+    Permission.update(Role.user(userAccount.$id)),
+    Permission.delete(Role.user(userAccount.$id))
+  ]
       );
 
-      return userAccount;
+      return this.getCurrentUser();
     } catch (error) {
       console.error("AuthService :: createAccount ::", error);
       throw error;
@@ -57,7 +56,8 @@ export class AuthService {
   // ✅ Login
   async login({ email, password }) {
     try {
-      return await this.account.createEmailPasswordSession(email, password);
+      await this.account.createEmailPasswordSession(email, password);
+      return this.getCurrentUser();
     } catch (error) {
       console.error("AuthService :: login ::", error);
       throw error;
@@ -67,22 +67,16 @@ export class AuthService {
   // ✅ Get Current User + Role from DB
  async getCurrentUser() {
   try {
-    const user = await this.account.get();
-    if (!user || !user.$id) return null;
+    const session = await this.account.get();
+    const userId = session.$id;
 
-    try {
-      const profile = await this.databases.getDocument(
-        conf.appwriteDatabaseId,
-        conf.appwriteUsersCollectionId,
-        user.$id
-      );
+    const docs = await this.databases.listDocuments(
+      conf.appwriteDatabaseId,  
+      conf.appwriteUsersCollectionId,
+      [Query.equal("userId", userId)]);
 
-      return { ...user, role: profile?.role || "user" };
-    } catch  {
-      // If user exists but profile doesn't, fallback
-      console.warn("No user profile found in DB. Returning default role.");
-      return { ...user, role: "user" };
-    }
+      return { ...session, ...docs.documents[0] };
+    
   } catch (error) {
     console.error("AuthService :: getCurrentUser ::", error);
     return null;
@@ -91,14 +85,21 @@ export class AuthService {
 
 
   // ✅ Logout
-  async logout() {
-    try {
+ // ✅ Logout
+async logout() {
+  try {
+    const session = await this.account.get(); // Check if logged in
+    if (session) {
       await this.account.deleteSessions();
-    } catch (error) {
+    }
+  } catch (error) {
+    // Optional: only log errors if it's not "guest" issue
+    if (error.code !== 401) {
       console.error("AuthService :: logout ::", error);
-      throw error;
     }
   }
+}
+
 }
 
 const authService = new AuthService();
