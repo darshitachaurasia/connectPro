@@ -1,43 +1,34 @@
 
-import {createSlice} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import service from "../appwrite/services";
 
-const initialState = {
-   mentors : [],
-   selectedMentor: null,
-   loading: false
-}
+export const fetchMentors = createAsyncThunk("mentor/fetchAll", async () => {
+  const response = await service.listMentors();
+  return response.documents;
+});
 
 const mentorSlice = createSlice({
-    name : 'mentor',
-    initialState,
-    reducers : {
-        fetchAllMentors : (state,action) => {
-            state.mentors = action.payload;
-            state.selectedMentor = null;
-            state.loading = false;
-        },
-        fetchMentorProfile : (state,action) => {
-            state.mentors = action.payload;
-            state.selectedMentor = action.payload;
-            state.loading = false;
-        },
-        updateMentorProfile: (state, action) => {
-            state.mentors = action.payload;
-            state.selectedMentor = action.payload;
-            state.loading = false;
-        },
-        setAvailableSlots: (state, action) => {
-            state.mentors = action.payload;
-            state.selectedMentor = action.payload;
-            state.loading = false; 
-        },
-        setLoading: (state, action) => {
-            state.loading = action.payload; 
-        },
-
-    }
-})
-
-export const {fetchAllMentors,fetchMentorById,updateMentorProfile,setAvailableSlots,setLoading} = mentorSlice.actions;
+  name: "mentor",
+  initialState: {
+    list: [],
+    status: "idle",
+    error: null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchMentors.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchMentors.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.list = action.payload;
+      })
+      .addCase(fetchMentors.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      });
+  },
+});
 
 export default mentorSlice.reducer;

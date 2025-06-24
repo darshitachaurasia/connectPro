@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
-import service from '../../appwrite/services';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import { fetchUserProfile } from "../../redux/userSlice";
+import { getCurrentUser } from "../../redux/authSlice";
+import { Input, Button } from "../../components";
 
-import { Input, Button } from '../../components'; // Adjust path if needed
-
-function UserProfilePage() {
+export default function UserProfilePage() {
+  const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth.user);
+  const userProfile = useSelector((state) => state.user.profile);
+  const userStatus = useSelector((state) => state.user.status);
+
   const {
     register,
     handleSubmit,
@@ -14,49 +18,32 @@ function UserProfilePage() {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  const [updateMessage, setUpdateMessage] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [updateMessage, setUpdateMessage] = useState("");
 
   useEffect(() => {
-    async function fetchUserProfile() {
-      if (!auth?.$id) return;
-
-      try {
-        const profile = await service.getUserProfile(auth.$id);
-        reset({
-          name: profile.name || '',
-          email: profile.email || '',
-          role: profile.role || 'user',
-          bio: profile.bio || '',
-        });
-      } catch (err) {
-        console.log('Failed to fetch user profile:', err);
-      } finally {
-        setLoading(false);
-      }
+    if (auth?.$id) {
+      dispatch(fetchUserProfile(auth.$id));
+    } else {
+      dispatch(getCurrentUser());
     }
+  }, [auth, dispatch]);
 
-    fetchUserProfile();
-  }, [auth, reset]);
+  useEffect(() => {
+    if (userProfile) {
+      reset({
+        name: userProfile.name || "",
+        email: userProfile.email || "",
+        role: userProfile.role || "user",
+        bio: userProfile.bio || "",
+      });
+    }
+  }, [userProfile, reset]);
 
   const onSubmit = async (data) => {
-    setUpdateMessage('');
-    try {
-      const updated = await service.updateUserProfile({
-        userId: auth.$id,
-        updatedData: data,
-      });
-
-      if (updated) {
-        setUpdateMessage('✅ Profile updated successfully!');
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      setUpdateMessage('❌ Failed to update profile.');
-    }
+    setUpdateMessage("✅ Profile update functionality should be implemented via userSlice.");
   };
 
-  if (loading) return <p className="text-center p-4">Loading profile...</p>;
+  if (userStatus === "loading") return <p className="text-center p-4">Loading profile...</p>;
 
   return (
     <div className="max-w-xl mx-auto mt-10 p-6 bg-white shadow-md rounded-md">
@@ -70,7 +57,7 @@ function UserProfilePage() {
         <Input
           label="Full Name:"
           placeholder="Enter your full name"
-          {...register('name', { required: 'Name is required' })}
+          {...register("name", { required: "Name is required" })}
         />
         {errors.name && <p className="text-red-600 text-sm">{errors.name.message}</p>}
 
@@ -78,19 +65,19 @@ function UserProfilePage() {
           label="Email:"
           type="email"
           readOnly
-          {...register('email')}
+          {...register("email")}
         />
 
         <Input
           label="Role:"
           readOnly
-          {...register('role')}
+          {...register("role")}
         />
 
         <div>
           <label className="block font-medium mb-1">Bio:</label>
           <textarea
-            {...register('bio')}
+            {...register("bio")}
             rows={4}
             className="w-full border px-3 py-2 rounded"
             placeholder="Tell us something about yourself..."
@@ -98,11 +85,9 @@ function UserProfilePage() {
         </div>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? 'Updating...' : 'Update Profile'}
+          {isSubmitting ? "Updating..." : "Update Profile"}
         </Button>
       </form>
     </div>
   );
 }
-
-export default UserProfilePage;

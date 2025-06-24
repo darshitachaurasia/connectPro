@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from '../../components/Header'
+
 import Hero from './phone.png'
 function LandingPage() {
   return (

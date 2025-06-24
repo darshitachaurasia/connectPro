@@ -13,7 +13,7 @@ import LandingPage from './pages/generalportal/LandingPage.jsx';
 import UserProfile from './pages/generalportal/UserProfile.jsx';
 import ServicesPage from './pages/generalportal/ServicesPage.jsx';
 import BookingDetails from './pages/generalportal/BookingDetails.jsx';
-import MentorListing from './pages/generalportal/MentorListing.jsx';
+import MentorListing from './pages/generalportal/MentorList.jsx';
 import UserSignUp from './pages/generalportal/UserSignUp.jsx';
 
 import MentorProfilePage from './pages/mentorPortal/MentorProfilePage.jsx';
@@ -29,6 +29,7 @@ import MentorDashboard from './pages/mentorPortal/MentorDashboard.jsx';
 import AdminDashboard from './pages/adminPortal/AdminDashboard.jsx';
 
 import AuthLayout from './components/AuthLayout.jsx';
+import MentorList from './pages/generalportal/MentorList.jsx';
 
 const router = createBrowserRouter([
   {
@@ -43,7 +44,7 @@ const router = createBrowserRouter([
       { path: '/user-signup', element: <UserSignUp /> },
 
       // Mentor listing and services are open to all
-      { path: '/mentors', element: <MentorListing /> },
+      { path: '/mentors', element: <MentorList /> },
       { path: '/service', element: <ServicesPage /> },
 
       // User Auth Routes

@@ -1,24 +1,37 @@
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { fetchBookingsByUser } from '../../redux/bookingSlice';
 
-function BookingDetails() {
-  const bookings = useSelector(state => state.booking.bookings);
-  const user = useSelector(state => state.user.profile);
+export default function BookingDetails() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const bookings = useSelector((state) => state.booking.list);
+  const user = useSelector((state) => state.user.profile);
 
-  const userBookings = bookings.filter(b => b.userName === user?.name);
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    } else {
+      dispatch(fetchBookingsByUser(user.$id));
+    }
+  }, [user, navigate, dispatch]);
+
+  const userBookings = bookings.filter((b) => b.userId === user?.$id);
 
   return (
     <div className="p-6">
       <h2 className="text-2xl font-semibold mb-4">Your Bookings</h2>
       {userBookings.length === 0 ? (
-        <p>No bookings yet.</p>
+        <p>No bookings found.</p>
       ) : (
         <ul className="space-y-4">
-          {userBookings.map(booking => (
-            <li key={booking.id} className="border p-4 rounded">
-              <p><strong>Mentor:</strong> {booking.mentorId}</p>
-              <p><strong>Date:</strong> {booking.date}</p>
+          {userBookings.map((booking) => (
+            <li key={booking.$id} className="border p-4 rounded">
+              <p><strong>Service:</strong> {booking.service}</p>
+              <p><strong>Mentor ID:</strong> {booking.mentorId}</p>
+              <p><strong>Date & Time:</strong> {booking.dateTime}</p>
               <p><strong>Status:</strong> {booking.status}</p>
-              <p><strong>Notes:</strong> {booking.notes}</p>
             </li>
           ))}
         </ul>
@@ -26,6 +39,4 @@ function BookingDetails() {
     </div>
   );
 }
-
-export default BookingDetails;
 

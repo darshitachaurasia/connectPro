@@ -9,7 +9,6 @@ import AuthLayout from './AuthLayout'
 import Input from './Input'
 import Button from './Button'
 import ProfilePage from './ProfilePage'
-import MentorCard from './MentorCard'
 
 export {
    
@@ -23,6 +22,6 @@ export {
     ProfilePage,
     Input,
     Button,
-    MentorCard
+   
     
 }

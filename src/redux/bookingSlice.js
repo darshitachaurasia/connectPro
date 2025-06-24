@@ -1,52 +1,55 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import service from "../appwrite/services";
 
-import {createSlice} from '@reduxjs/toolkit';
-import { set } from 'react-hook-form';
+export const fetchBookingsByUser = createAsyncThunk(
+  "booking/fetchByUser",
+  async (userId) => {
+    const response = await service.listBookingsByUser(userId);
+    return response.documents;
+  }
+);
 
-const initialState = {
-    bookings: [],
-  currentBooking: null,
-  loading: false,
-}
+export const createBooking = createAsyncThunk(
+  "booking/create",
+  async ({ userId, mentorId, serviceName, dateTime }) => {
+    const slug = `${userId}_${mentorId}_${Date.now()}`;
+    const booking = await service.createBooking({
+      userId,
+      mentorId,
+      service: serviceName,
+      dateTime,
+      status: "pending",
+      slug,
+    });
+    return booking;
+  }
+);
 
 const bookingSlice = createSlice({
-    name : 'booking',
-    initialState,
-    reducers : {
-        createBooking : (state, action) => {
-            const newBooking = action.payload;
-            state.bookings.push(newBooking);
-            state.loading = false;
-        },
-        fetchUserBookings : (state) => {
-            state.loading = true;
-        },
-        fetchMentorBookings : (state,action) => {
-            state.bookings = action.payload;
-            state.loading = false;
-        },
-        updateBookingStatus: (state, action) => {
-            const { bookingId, status } = action.payload;
-            const bookingIndex = state.bookings.findIndex(booking => booking.id === bookingId);
-            if (bookingIndex !== -1) {
-                state.bookings[bookingIndex].status = status;
-            }
-            state.loading = false;
-        },
-        acceptUserBooking: (state,action)=> {
-            const { bookingId } = action.payload;
-            const bookingIndex = state.bookings.findIndex(booking => booking.id === bookingId);
-            if (bookingIndex !== -1) {
-                state.bookings[bookingIndex].status = 'accepted';
-            }
-            state.loading = false;
-        },
-        setLoading: (state, action) => {
-            state.loading = action.payload;
-        },
-
-    }
-})
-
-export const {createBooking, fetchUserBookings, fetchMentorBookings, updateBookingStatus, setLoading} = bookingSlice.actions;
+  name: "booking",
+  initialState: {
+    list: [],
+    status: "idle",
+    error: null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchBookingsByUser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchBookingsByUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.list = action.payload;
+      })
+      .addCase(fetchBookingsByUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(createBooking.fulfilled, (state, action) => {
+        state.list.push(action.payload);
+      });
+  },
+});
 
 export default bookingSlice.reducer;

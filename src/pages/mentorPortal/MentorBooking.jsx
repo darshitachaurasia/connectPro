@@ -1,71 +1,75 @@
-// pages/mentor/MentorBookingDetailsPage.jsx
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchMentorBookings, updateBookingStatus } from '../../redux/bookingSlice';
-import { fetchMentorById } from '../../redux/mentorSlice';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { fetchBookingsByUser } from "../../redux/bookingSlice";
+import { fetchMentors } from "../../redux/mentorSlice";
+import service from "../../appwrite/services";
 
-function MentorBooking() {
+export default function MentorBooking() {
+  const { mentorId } = useParams();
   const dispatch = useDispatch();
-  const mentor = useSelector(state => state.auth.userData); // assuming this is the logged-in mentor
-  const bookings = useSelector(state => state.booking.bookings);
-  const loading = useSelector(state => state.booking.loading);
+
+  const bookings = useSelector((state) => state.booking.list);
+  const bookingStatus = useSelector((state) => state.booking.status);
+  const mentors = useSelector((state) => state.mentor.list);
+  const mentorStatus = useSelector((state) => state.mentor.status);
+
+  const [usersMap, setUsersMap] = useState({});
 
   useEffect(() => {
-    if (mentor?.id) {
-      dispatch(fetchMentorById(mentor.id)); // Load mentor if needed
-      dispatch(fetchMentorBookings(mentor.id)); // Load bookings for this mentor
+    const loggedInMentorId = mentorId;
+    if (loggedInMentorId) {
+      dispatch(fetchBookingsByUser(loggedInMentorId));
     }
-  }, [mentor?.id, dispatch]);
+    if (mentorStatus === "idle") {
+      dispatch(fetchMentors());
+    }
+  }, [dispatch, mentorId, mentorStatus]);
 
-  const handleStatusChange = (bookingId, status) => {
-    dispatch(updateBookingStatus({ bookingId, status }));
-    // Optional: Also update backend with asyncThunk or API call
-  };
+  useEffect(() => {
+    async function fetchUsers() {
+      const userIds = [...new Set(bookings.map((b) => b.userId))];
+      const map = {};
+      for (const id of userIds) {
+        try {
+          const user = await service.getUserProfile(id);
+          map[id] = user.name || id;
+        } catch {
+          map[id] = id;
+        }
+      }
+      setUsersMap(map);
+    }
 
-  const filteredBookings = bookings.filter(b => b.mentorId === mentor?.id);
+    if (bookings.length > 0) {
+      fetchUsers();
+    }
+  }, [bookings]);
+
+  const mentor = mentors.find((m) => m.$id === mentorId);
+
+  const mentorBookings = bookings.filter((b) => b.mentorId === mentorId);
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Your Bookings</h2>
+      <h2 className="text-2xl font-bold mb-4">
+        Bookings for {mentor ? mentor.name : "Loading..."}
+      </h2>
 
-      {loading ? (
+      {bookingStatus === "loading" ? (
         <p>Loading bookings...</p>
-      ) : filteredBookings.length === 0 ? (
-        <p>No bookings available.</p>
       ) : (
-        <div className="space-y-4">
-          {filteredBookings.map(booking => (
-            <div key={booking.id} className="border p-4 rounded shadow-sm bg-white">
-              <p><strong>User:</strong> {booking.userName}</p>
-              <p><strong>Date:</strong> {booking.date}</p>
-              <p><strong>Notes:</strong> {booking.notes || 'No notes provided'}</p>
-              <p><strong>Status:</strong> <span className="capitalize">{booking.status}</span></p>
-
-              {booking.status === 'pending' && (
-                <div className="mt-3 flex gap-2">
-                  <button
-                    onClick={() => handleStatusChange(booking.id, 'accepted')}
-                    className="bg-green-500 text-white px-3 py-1 rounded"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(booking.id, 'rejected')}
-                    className="bg-red-500 text-white px-3 py-1 rounded"
-                  >
-                    Reject
-                  </button>
-                </div>
-              )}
-            </div>
+        <ul className="space-y-4">
+          {mentorBookings.map((booking) => (
+            <li key={booking.$id} className="border p-4 rounded-xl shadow">
+              <p><strong>Service:</strong> {booking.service}</p>
+              <p><strong>Date:</strong> {booking.dateTime}</p>
+              <p><strong>Status:</strong> {booking.status}</p>
+              <p><strong>Booked By:</strong> {usersMap[booking.userId] || booking.userId}</p>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
 }
-
-export default MentorBooking;
-
-
-

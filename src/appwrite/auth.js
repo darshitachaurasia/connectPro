@@ -4,7 +4,7 @@ import { Client, Account, ID, Databases ,Query,Permission,Role} from "appwrite";
 export class AuthService {
   client = new Client();
   account;
-  databases;
+
 
   constructor() {
     this.client

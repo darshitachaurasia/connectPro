@@ -14,7 +14,7 @@ function SideBar() {
     general: [  
       { name: 'SignUp', path: '/user-signup' },
       { name: 'User Profile', path: '/profile' },
-      { name: 'Mentors Listing', path: '/mentors' },
+      { name: 'Mentors List', path: '/mentors' },
       { name: 'Services', path: '/service' },
       { name: 'Booking Details', path: '/booking-details' },
     ],
