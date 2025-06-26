@@ -12,24 +12,26 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import LandingPage from './pages/generalportal/LandingPage.jsx';
 import UserProfile from './pages/generalportal/UserProfile.jsx';
 import ServicesPage from './pages/generalportal/ServicesPage.jsx';
-import BookingDetails from './pages/generalportal/BookingDetails.jsx';
-import MentorListing from './pages/generalportal/MentorList.jsx';
+
 import UserSignUp from './pages/generalportal/UserSignUp.jsx';
 
 import MentorProfilePage from './pages/mentorPortal/MentorProfilePage.jsx';
 import MentorBooking from './pages/mentorPortal/MentorBooking.jsx';
 
-import AnalyticsPage from './pages/adminPortal/AnalyticsPage.jsx';
+
 import UserManagementPage from './pages/adminPortal/UserManagementPage.jsx';
 import MentorManagement from './pages/adminPortal/MentorManagement.jsx';
+import BookingDetails from './pages/generalportal/BookingDetails'
 
-import ProtectedRoute from './components/ProtectedRoute.jsx';
 import UserDashboard from './pages/generalportal/UserDashboard.jsx';
 import MentorDashboard from './pages/mentorPortal/MentorDashboard.jsx';
 import AdminDashboard from './pages/adminPortal/AdminDashboard.jsx';
 
-import AuthLayout from './components/AuthLayout.jsx';
+
 import MentorList from './pages/generalportal/MentorList.jsx';
+import BookingPage from './pages/generalportal/BookingPage.jsx';
+import MentorDetails from './pages/generalportal/MentorDetails.jsx';
+import BookingManagement from './pages/adminPortal/BookingManagement.jsx';
 
 const router = createBrowserRouter([
   {
@@ -51,25 +53,41 @@ const router = createBrowserRouter([
       {
         path: '/user-login',
         element: (
-          <ProtectedRoute allowedRoles={['user']}>
+          
             <UserDashboard />
-          </ProtectedRoute>
+        
         ),
       },
       {
         path: '/profile',
         element: (
-          <ProtectedRoute allowedRoles={['user']}>
+          
             <UserProfile />
-          </ProtectedRoute>
+          
         ),
       },
       {
         path: '/booking-details',
         element: (
-          <ProtectedRoute allowedRoles={['user']}>
+         
             <BookingDetails />
-          </ProtectedRoute>
+         
+        ),
+      },
+      {
+        path: '/booking-page/:mentorId',
+        element: (
+         
+            <BookingPage />
+         
+        ),
+      },
+       {
+        path: '/mentor-details',
+        element: (
+          
+            <MentorDetails />
+       
         ),
       },
 
@@ -77,25 +95,25 @@ const router = createBrowserRouter([
       {
         path: '/mentor-login',
         element: (
-          <ProtectedRoute allowedRoles={['mentor']}>
+          
             <MentorDashboard />
-          </ProtectedRoute>
+         
         ),
       },
       {
         path: '/mentor-profile',
         element: (
-          <ProtectedRoute allowedRoles={['mentor']}>
+          
             <MentorProfilePage />
-          </ProtectedRoute>
+        
         ),
       },
       {
         path: '/mentor-bookings',
         element: (
-          <ProtectedRoute allowedRoles={['mentor']}>
+          
             <MentorBooking />
-          </ProtectedRoute>
+       
         ),
       },
 
@@ -103,33 +121,33 @@ const router = createBrowserRouter([
       {
         path: '/admin-login',
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          
             <AdminDashboard />
-          </ProtectedRoute>
+          
         ),
       },
       {
-        path: '/admin-analytics',
+        path: '/booking-manage',
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AnalyticsPage />
-          </ProtectedRoute>
+          
+            <BookingManagement />
+          
         ),
       },
       {
         path: '/manage-users',
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          
             <UserManagementPage />
-          </ProtectedRoute>
+        
         ),
       },
       {
         path: '/manage-mentors',
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          
             <MentorManagement />
-          </ProtectedRoute>
+         
         ),
       },
 
@@ -145,9 +163,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <AuthLayout>
+      
         <RouterProvider router={router} />
-      </AuthLayout>
+      
     </Provider>
   </React.StrictMode>
 );

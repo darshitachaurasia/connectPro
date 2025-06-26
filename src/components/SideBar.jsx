@@ -11,22 +11,21 @@ function SideBar() {
 
   // 🧭 Add paths for each page
   const pages = {
-    general: [  
+    authentication: [  
       { name: 'SignUp', path: '/user-signup' },
       { name: 'User Profile', path: '/profile' },
-      { name: 'Mentors List', path: '/mentors' },
-      { name: 'Services', path: '/service' },
-      { name: 'Booking Details', path: '/booking-details' },
-    ],
-    expert: [
+      { name: 'Login', path: '/login' },
+      { name:  'Dashboard', path: '/user-login' }
      
-      { name: 'Mentor Profile', path: '/mentor-profile' },
-      { name: 'Booking Details', path: '/mentor-bookings' },
+      
     ],
-    admin: [
-      { name: 'Analytics Page', path: '/admin-analytics' },
-      { name: 'User Management', path: '/manage-users' },
-      { name: 'Mentor Management', path: '/manage-mentors' },
+    booking: [
+     { name: 'Mentors List', path: '/mentors' },
+     { name: 'Booking Details', path: '/booking-details' },
+      
+    ],
+     services: [
+       { name: 'Services', path: '/service' },
     ],
   };
 
@@ -56,7 +55,7 @@ function SideBar() {
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <h2 className="text-2xl font-bold mb-6">Portals</h2>
+        <h2 className="text-2xl font-bold mb-6 text-amber-100">User Dashboard</h2>
 
         {Object.entries(pages).map(([key, links]) => (
           <div key={key} className="mb-4">
@@ -64,7 +63,7 @@ function SideBar() {
               className="w-full flex items-center justify-between text-left font-semibold hover:text-[#ff00e6] transition"
               onClick={() => toggleSection(key)}
             >
-              <span className="capitalize">{key} Dashboard</span>
+              <span className="capitalize">{key} </span>
               <svg
                 className={`w-5 h-5 text-white transform transition-transform duration-300 ${
                   openSection === key ? 'rotate-180' : ''

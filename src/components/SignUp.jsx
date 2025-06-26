@@ -1,25 +1,36 @@
-
-import { Link, Navigate, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Input, Logo } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { signUpUser } from '../redux/authSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 function SignUp() {
   const { user, error, status } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, setValue } = useForm();
   const navigate = useNavigate();
+
+  const [selectedRole, setSelectedRole] = useState("");
+
   const onSubmit = (data) => {
-      dispatch(signUpUser(data));
-    };
-useEffect(() => {
-    if (user) {
-      if (user.role === 'admin') navigate('/admin-login');
-      else if (user.role === 'mentor') navigate('/mentor-login');
-      else navigate('/user-login');
+  dispatch(signUpUser(data)).then((res) => {
+    if (res.meta.requestStatus === "fulfilled") {
+      const role = res.payload.role; // this should come from the returned user
+      if (role === "admin") navigate("/admin-login");
+      else if (role === "mentor") navigate("/mentor-login");
+      else if (role === "user") navigate("/user-login");
     }
-  }, [user, navigate]);
+  });
+};
+
+
+  // Navigate immediately on role selection
+  useEffect(() => {
+    if (selectedRole === "admin") navigate("/admin-login");
+    else if (selectedRole === "mentor") navigate("/mentor-login");
+    else if (selectedRole === "user") navigate("/user-login");
+  }, [selectedRole, navigate]);
 
   return (
     <div className="flex items-center justify-center">
@@ -73,11 +84,17 @@ useEffect(() => {
               })}
             />
 
+            {/* Role selection with instant redirect */}
             <select
-              {...register("role", { required: "Role is required" })}
               className="w-full mt-2 p-2 border border-gray-300 rounded-md"
+              onChange={(e) => {
+                const role = e.target.value;
+                setValue("role", role); // also update react-hook-form
+                setSelectedRole(role);
+              }}
+              defaultValue=""
             >
-              <option value="">Select your role</option>
+              <option value="" disabled>Select your role</option>
               <option value="user">User</option>
               <option value="mentor">Mentor</option>
               <option value="admin">Admin</option>
@@ -94,6 +111,7 @@ useEffect(() => {
 }
 
 export default SignUp;
+
 
 
 

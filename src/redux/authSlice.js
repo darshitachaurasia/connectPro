@@ -1,61 +1,73 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import  AuthService  from '../appwrite/auth';
 
-// --- Thunks for Auth Actions ---
-export const loginUser = createAsyncThunk(
-  'auth/login',
-  async (credentials, thunkAPI) => {
-    try {
-      await AuthService.login(credentials);
-      const user = await AuthService.getCurrentUser();
-      return user;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);
+// Simulated "database" (in real apps, you'd fetch from server)
+let mockUsers = [
+  { email: 'darshita@example.com', password: '123456', name: 'Darshita' },
+];
 
-export const signUpUser = createAsyncThunk(
-  'auth/signup',
-  async (formData, thunkAPI) => {
-    try {
-      await AuthService.signUp(formData);
-      const user = await AuthService.getCurrentUser();
-      return user;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);
+// Helper to simulate local auth session
+const saveUserToLocal = (user) => {
+  localStorage.setItem('mock_user', JSON.stringify(user));
+};
 
-export const getCurrentUser = createAsyncThunk(
-  'auth/getCurrentUser',
-  async (_, thunkAPI) => {
-    try {
-      const user = await AuthService.getCurrentUser();
-      return user;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);
+const getUserFromLocal = () => {
+  const user = localStorage.getItem('mock_user');
+  return user ? JSON.parse(user) : null;
+};
 
-export const logoutUser = createAsyncThunk(
-  'auth/logout',
-  async (_, thunkAPI) => {
-    try {
-      await AuthService.logout();
-      return true;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
+const removeUserFromLocal = () => {
+  localStorage.removeItem('mock_user');
+};
+
+// --- Thunks for Auth Actions (Mocked) ---
+export const loginUser = createAsyncThunk('auth/login', async (credentials, thunkAPI) => {
+  const user = mockUsers.find(
+    (u) => u.email === credentials.email && u.password === credentials.password
+  );
+
+  if (!user) {
+    return thunkAPI.rejectWithValue('Invalid email or password');
   }
-);
+
+  saveUserToLocal(user);
+  return user;
+});
+
+export const signUpUser = createAsyncThunk('auth/signup', async (formData, thunkAPI) => {
+  const existing = mockUsers.find((u) => u.email === formData.email);
+  if (existing) {
+    return thunkAPI.rejectWithValue('User already exists');
+  }
+
+  const newUser = {
+    email: formData.email,
+    password: formData.password,
+    name: formData.name || formData.email.split('@')[0],
+  };
+
+  mockUsers.push(newUser);
+  saveUserToLocal(newUser);
+  return newUser;
+});
+
+export const getCurrentUser = createAsyncThunk('auth/getCurrentUser', async (_, thunkAPI) => {
+  const user = getUserFromLocal();
+  if (user) {
+    return user;
+  } else {
+    return thunkAPI.rejectWithValue('No user logged in');
+  }
+});
+
+export const logoutUser = createAsyncThunk('auth/logout', async () => {
+  removeUserFromLocal();
+  return true;
+});
 
 // --- Initial State ---
 const initialState = {
-  user: null,
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  user: getUserFromLocal(),
+  status: 'idle',
   error: null,
 };
 
@@ -64,10 +76,8 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {},
-
   extraReducers: (builder) => {
     builder
-      // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.status = 'loading';
         state.error = null;
@@ -81,7 +91,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // SIGNUP
       .addCase(signUpUser.pending, (state) => {
         state.status = 'loading';
         state.error = null;
@@ -95,7 +104,6 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
 
-      // GET CURRENT USER
       .addCase(getCurrentUser.pending, (state) => {
         state.status = 'loading';
       })
@@ -103,12 +111,11 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.status = 'succeeded';
       })
-      .addCase(getCurrentUser.rejected, (state, action) => {
+      .addCase(getCurrentUser.rejected, (state) => {
         state.user = null;
-        state.status = 'idle'; // not failed: just not logged in
+        state.status = 'idle';
       })
 
-      // LOGOUT
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.status = 'idle';

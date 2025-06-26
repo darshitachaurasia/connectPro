@@ -4,7 +4,7 @@ import userReducer from "./userSlice";
 import mentorReducer from "./mentorSlice";
 import bookingReducer from "./bookingSlice";
 import adminReducer from "./adminSlice";
-import themeReducer from "./themeSlice";
+
 
  const store = configureStore({
     reducer: {
@@ -13,7 +13,7 @@ import themeReducer from "./themeSlice";
      mentor: mentorReducer,
      booking : bookingReducer,
      admin : adminReducer,
-     theme : themeReducer,
+     
     
     }
 })

@@ -1,43 +1,45 @@
-
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function UserDashboard() {
-  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-800 to-pink-600 text-white flex flex-col items-center justify-start p-8">
-      <p className="text-xl italic text-gray-200 mb-8">
-        “The beautiful thing about learning is that nobody can take it away from you.” — B.B. King
-      </p>
+    <div className="min-h-screen bg-gradient-to-br from-[#0c0822] via-[#1e0e2f] to-[#2d0727] text-white flex flex-col items-center justify-start p-10 overflow-hidden">
 
-     
-      {/* Functional Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-        <DashboardCard title="👤 My Profile" to="/profile" />
-        <DashboardCard title="📅 Book a Mentor" to="/book-mentor" />
-        <DashboardCard title="📖 My Bookings" to="/booking-details" />
-        <DashboardCard title="🛠️ Services" to="/service" />
-      </div>
-
-      {/* Logout */}
-      <Link
-        to="/logout"
-        className="mt-10 px-6 py-2 bg-red-600 rounded-full hover:bg-red-700 transition"
+      {/* Inspirational Quote */}
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+        className="text-6xl italic text-gray-200 mb-14 text-center max-w-7xl"
       >
-        Logout
-      </Link>
+        “The beautiful thing about learning is that nobody can take it away from you.” — B.B. King
+      </motion.p>
+
+      {/* Dashboard Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 w-full max-w-3xl px-4">
+        <DashboardCard title="👤 My Profile" to="/profile" color="from-[#2d0727] to-[#601e5c]" />
+        <DashboardCard title="📅 Book a Mentor" to="/mentors" color="from-[#1e0e2f] to-[#47126b]" />
+        <DashboardCard title="📖 My Bookings" to="/booking-details" color="from-[#0c0822] to-[#2d0727]" />
+        <DashboardCard title="🛠️ Services" to="/service" color="from-[#842d5d] to-[#2d0727]" />
+      </div>
     </div>
   );
 }
 
-function DashboardCard({ title, to }) {
+// Card Component with consistent gradients
+function DashboardCard({ title, to, color }) {
   return (
-    <Link
-      to={to}
-      className="bg-white/20 backdrop-blur-md p-6 rounded-xl hover:bg-white/30 transition duration-200 text-center shadow-lg"
+    <motion.div
+      whileHover={{ scale: 1.07 }}
+      transition={{ type: 'spring', stiffness: 300 }}
+      className="rounded-full shadow-2xl"
     >
-      <h2 className="text-2xl font-semibold">{title}</h2>
-    </Link>
+      <Link
+        to={to}
+        className={`bg-gradient-to-r ${color} text-white text-xl font-semibold rounded-full h-40 flex items-center justify-center text-center px-6 transition duration-300 hover:opacity-90 hover:shadow-pink-400/30`}
+      >
+        {title}
+      </Link>
+    </motion.div>
   );
 }
-
-

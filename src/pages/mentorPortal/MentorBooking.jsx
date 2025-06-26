@@ -1,9 +1,10 @@
+// --- MentorBooking.jsx ---
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { fetchBookingsByUser } from "../../redux/bookingSlice";
+import { fetchBookingsByMentor } from "../../redux/bookingSlice";
 import { fetchMentors } from "../../redux/mentorSlice";
-import service from "../../appwrite/services";
+import { Link } from "react-router-dom";
 
 export default function MentorBooking() {
   const { mentorId } = useParams();
@@ -14,62 +15,54 @@ export default function MentorBooking() {
   const mentors = useSelector((state) => state.mentor.list);
   const mentorStatus = useSelector((state) => state.mentor.status);
 
-  const [usersMap, setUsersMap] = useState({});
-
   useEffect(() => {
-    const loggedInMentorId = mentorId;
-    if (loggedInMentorId) {
-      dispatch(fetchBookingsByUser(loggedInMentorId));
+    if (mentorId) {
+      dispatch(fetchBookingsByMentor(mentorId));
     }
     if (mentorStatus === "idle") {
       dispatch(fetchMentors());
     }
   }, [dispatch, mentorId, mentorStatus]);
 
-  useEffect(() => {
-    async function fetchUsers() {
-      const userIds = [...new Set(bookings.map((b) => b.userId))];
-      const map = {};
-      for (const id of userIds) {
-        try {
-          const user = await service.getUserProfile(id);
-          map[id] = user.name || id;
-        } catch {
-          map[id] = id;
-        }
-      }
-      setUsersMap(map);
-    }
-
-    if (bookings.length > 0) {
-      fetchUsers();
-    }
-  }, [bookings]);
-
-  const mentor = mentors.find((m) => m.$id === mentorId);
-
-  const mentorBookings = bookings.filter((b) => b.mentorId === mentorId);
+  const mentor = mentors.find((m) => m.id === mentorId);
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">
-        Bookings for {mentor ? mentor.name : "Loading..."}
+    <div className="min-h-screen px-8 py-16 bg-gradient-to-br from-[#0c0822] to-[#2d0727] text-white">
+      <h2 className="text-4xl font-bold mb-10 text-center text-pink-400">
+        Bookings for {mentor?.name || "..."}
       </h2>
 
       {bookingStatus === "loading" ? (
-        <p>Loading bookings...</p>
+        <p className="text-center text-xl">Loading bookings...</p>
       ) : (
-        <ul className="space-y-4">
-          {mentorBookings.map((booking) => (
-            <li key={booking.$id} className="border p-4 rounded-xl shadow">
-              <p><strong>Service:</strong> {booking.service}</p>
-              <p><strong>Date:</strong> {booking.dateTime}</p>
-              <p><strong>Status:</strong> {booking.status}</p>
-              <p><strong>Booked By:</strong> {usersMap[booking.userId] || booking.userId}</p>
+        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {bookings.map((booking) => (
+            <li
+              key={booking.id}
+              className="bg-[#1e0e2f] p-6 rounded-lg shadow-md border border-pink-500/20"
+            >
+              <p>
+                <strong>📌 User ID:</strong> {booking.userId}
+              </p>
+              <p>
+                <strong>📅 Date:</strong> {booking.dateTime}
+              </p>
+              <p>
+                <strong>📍 Status:</strong> {booking.status}
+              </p>
             </li>
           ))}
         </ul>
       )}
+
+      <div className="mt-10 text-center">
+        <Link
+          to="/mentor-login"
+          className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-[#2d0727] text-white border border-pink-500 hover:bg-pink-600 hover:shadow-lg transition duration-300"
+        >
+          ⬅️ Back to Dashboard
+        </Link>
+      </div>
     </div>
   );
 }
