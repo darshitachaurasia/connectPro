@@ -12,7 +12,7 @@ function App() {
         dispatch(getCurrentUser());
     }, [dispatch]);
     return (
-        <div className="flex flex-wrap content-between min-h-screen bg-[#2d0727]">
+        <div className="flex flex-wrap content-between min-h-screen bg-white">
             <div className="w-full block">
                 <ToastContainer />
                 <Header />

@@ -22,9 +22,9 @@ export default function BookingDetails() {
   const userBookings = bookings.filter((b) => b.userId === user?.$id);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0c0822] to-[#2d0727] text-white py-12 px-6 flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-950 to-blue-700 text-white py-12 px-6 flex flex-col items-center">
       <motion.h2
-        className="text-4xl font-bold text-pink-300 mb-10 text-center"
+        className="text-4xl font-bold text-blue-300 mb-10 text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -61,19 +61,19 @@ export default function BookingDetails() {
               variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
             >
               <p className="mb-1">
-                <span className="text-pink-200 font-medium">Service:</span>{' '}
+                <span className="text-blue-200 font-medium">Service:</span>{' '}
                 {booking.service}
               </p>
               <p className="mb-1">
-                <span className="text-pink-200 font-medium">Mentor ID:</span>{' '}
+                <span className="text-blue-200 font-medium">Mentor ID:</span>{' '}
                 {booking.mentorId}
               </p>
               <p className="mb-1">
-                <span className="text-pink-200 font-medium">Date & Time:</span>{' '}
+                <span className="text-blue-200 font-medium">Date & Time:</span>{' '}
                 {new Date(booking.dateTime).toLocaleString()}
               </p>
               <p>
-                <span className="text-pink-200 font-medium">Status:</span>{' '}
+                <span className="text-blue-200 font-medium">Status:</span>{' '}
                 {booking.status || 'Pending'}
               </p>
             </motion.li>

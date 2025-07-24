@@ -34,7 +34,7 @@ function SideBar() {
       {/* Hamburger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed right-4 z-[60] bg-[#2d0727] p-2 rounded-md shadow-md"
+        className="fixed right-4 z-[60] bg-blue-900 p-2 rounded-md shadow-md"
       >
         <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24">
           <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M5 7h14M5 12h14M5 17h14" />
@@ -51,7 +51,7 @@ function SideBar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 bg-[#2d0727] text-white p-6 transition-transform duration-300 shadow-lg z-50 ${
+        className={`fixed top-0 right-0 h-full w-72 bg-blue-800 text-white p-6 transition-transform duration-300 shadow-lg z-50 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -60,7 +60,7 @@ function SideBar() {
         {Object.entries(pages).map(([key, links]) => (
           <div key={key} className="mb-4">
             <button
-              className="w-full flex items-center justify-between text-left font-semibold hover:text-[#ff00e6] transition"
+              className="w-full flex items-center justify-between text-left font-semibold hover:text-blue-600 transition"
               onClick={() => toggleSection(key)}
             >
               <span className="capitalize">{key} </span>
@@ -83,7 +83,7 @@ function SideBar() {
                     <Link
                       to={page.path}
                       onClick={() => setIsOpen(false)}
-                      className="block hover:text-[#ff00e6] transition"
+                      className="block hover:text-blue-600 transition"
                     >
                       {page.name}
                     </Link>

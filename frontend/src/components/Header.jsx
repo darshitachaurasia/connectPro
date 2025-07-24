@@ -9,47 +9,32 @@ function Header() {
   const navigate = useNavigate();
 
   const navItems = [
-    {
-      name: 'Home',
-      slug: '/',
-      active: true,
-    },
-    {
-      name: 'Login',
-      slug: '/login',
-      active: !authUser,
-    },
-    {
-      name: 'SignUp',
-      slug: '/signup',
-      active: !authUser,
-    },
-    {
-      name: 'Services',
-      slug: '/service',
-      active: true,
-    },
+    { name: 'Home', slug: '/', active: true },
+    { name: 'Login', slug: '/login', active: !authUser },
+    { name: 'SignUp', slug: '/signup', active: !authUser },
+    { name: 'Services', slug: '/service', active: true },
   ];
 
   return (
-    <header className="py-3 shadow bg-[#2d0727] text-white">
+    <header className="py-3 shadow-md bg-white text-blue-700">
       <nav className="flex items-center justify-between px-6">
-        {/* Logo */}
-        <div className="flex items-center gap-4">
+        
+        {/* ✅ Logo */}
+        <div className="flex items-center">
           <Link to="/">
             <Logo width="70px" />
           </Link>
         </div>
 
-        {/* Navigation Links */}
-        <ul className="flex items-center gap-2">
+        {/* ✅ Navigation Links */}
+        <ul className="hidden md:flex items-center gap-4">
           {navItems.map(
             (item) =>
               item.active && (
                 <li key={item.name}>
                   <button
                     onClick={() => navigate(item.slug)}
-                    className="px-6 py-2 duration-200 hover:bg-white hover:text-black rounded-full"
+                    className="px-4 py-2 font-medium rounded-full text-blue-700 border border-transparent hover:border-blue-700 hover:bg-blue-50 transition-all duration-200"
                   >
                     {item.name}
                   </button>
@@ -57,7 +42,7 @@ function Header() {
               )
           )}
 
-          {/* Logout Button */}
+          {/* ✅ Logout Button */}
           {authUser && (
             <li>
               <LogoutBtn />
@@ -65,8 +50,10 @@ function Header() {
           )}
         </ul>
 
-        {/* Sidebar (optional for small screens) */}
-        <SideBar />
+        {/* ✅ Sidebar (for small screens) */}
+        <div className="md:hidden">
+          <SideBar />
+        </div>
       </nav>
     </header>
   );

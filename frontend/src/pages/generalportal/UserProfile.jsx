@@ -74,17 +74,17 @@ export default function UserProfilePage() {
         );
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0c0822] to-[#2d0727] px-4">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-950 to-blue-700 px-4">
             <div className="w-full max-w-2xl bg-white/10 backdrop-blur-md text-white rounded-2xl p-10 border border-white/20 shadow-2xl relative">
                 {/* Avatar */}
                 <div className="flex flex-col items-center mb-6">
-                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-pink-400 to-purple-600 flex items-center justify-center text-5xl font-bold shadow-lg mb-2">
+                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-5xl font-bold shadow-lg mb-2">
                         {user?.fullname ? user.fullname[0].toUpperCase() : "U"}
                     </div>
                     <h2 className="text-3xl font-extrabold mb-1 tracking-wide">
                         {user?.fullname || "User"}
                     </h2>
-                    <span className="text-pink-300 text-lg font-medium">
+                    <span className="text-blue-300 text-lg font-medium">
                         {user?.role
                             ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
                             : "User"}
@@ -96,20 +96,20 @@ export default function UserProfilePage() {
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-pink-300 font-semibold mb-1">
+                            <label className="block text-blue-300 font-semibold mb-1">
                                 Full Name
                             </label>
                             <input
-                                className="w-full rounded-lg px-4 py-2 bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                                className="w-full rounded-lg px-4 py-2 bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 placeholder="Enter your full name"
                                 {...register("name", { required: "Name is required" })}
                             />
                             {errors.name && (
-                                <p className="text-pink-200 text-xs mt-1">{errors.name.message}</p>
+                                <p className="text-blue-200 text-xs mt-1">{errors.name.message}</p>
                             )}
                         </div>
                         <div>
-                            <label className="block text-pink-300 font-semibold mb-1">Email</label>
+                            <label className="block text-blue-300 font-semibold mb-1">Email</label>
                             <div className="flex items-center gap-2">
                                 <input
                                     className="w-full rounded-lg px-4 py-2 bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none"
@@ -120,7 +120,7 @@ export default function UserProfilePage() {
                                 {/* Email verification UI */}
                                 <button
                                     type="button"
-                                    className="ml-2 px-3 py-1 rounded bg-pink-500 hover:bg-pink-600 text-white text-xs font-semibold transition"
+                                    className="ml-2 px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition"
                                     onClick={handleVerifyEmail} // Implement this handler to trigger OTP
                                     disabled={user?.isEmailVerified}
                                     title={user?.isEmailVerified ? "Verified" : "Verify Email"}
@@ -150,7 +150,7 @@ export default function UserProfilePage() {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-pink-300 font-semibold mb-1">Role</label>
+                            <label className="block text-blue-300 font-semibold mb-1">Role</label>
                             <input
                                 className="w-full rounded-lg px-4 py-2 bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none"
                                 readOnly
@@ -158,7 +158,7 @@ export default function UserProfilePage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-pink-300 font-semibold mb-1">Bio</label>
+                            <label className="block text-blue-300 font-semibold mb-1">Bio</label>
                             <textarea
                                 className="w-full rounded-lg px-4 py-2 bg-white/20 border border-white/30 text-white placeholder-white/60 focus:outline-none min-h-[80px]"
                                 rows={4}

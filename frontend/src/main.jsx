@@ -16,9 +16,6 @@ import ServicesPage from "./pages/generalportal/ServicesPage.jsx";
 
 import UserSignUp from "./pages/generalportal/UserSignUp.jsx";
 
-import MentorProfilePage from "./pages/mentorPortal/MentorProfilePage.jsx";
-import MentorBooking from "./pages/mentorPortal/MentorBooking.jsx";
-
 import UserManagementPage from "./pages/adminPortal/UserManagementPage.jsx";
 import MentorManagement from "./pages/adminPortal/MentorManagement.jsx";
 import BookingDetails from "./pages/generalportal/BookingDetails";
@@ -27,10 +24,11 @@ import UserDashboard from "./pages/generalportal/UserDashboard.jsx";
 import MentorDashboard from "./pages/mentorPortal/MentorDashboard.jsx";
 import AdminDashboard from "./pages/adminPortal/AdminDashboard.jsx";
 
-import MentorList from "./pages/generalportal/MentorList.jsx";
+
 import BookingPage from "./pages/generalportal/BookingPage.jsx";
 import MentorDetails from "./pages/generalportal/MentorDetails.jsx";
 import BookingManagement from "./pages/adminPortal/BookingManagement.jsx";
+import TopMentors from "./components/TopMentors.jsx";
 
 const router = createBrowserRouter([
     {
@@ -45,7 +43,7 @@ const router = createBrowserRouter([
             { path: "/user-signup", element: <UserSignUp /> },
 
             // Mentor listing and services are open to all
-            { path: "/mentors", element: <MentorList /> },
+            { path: "/mentors", element: <TopMentors /> },
             { path: "/service", element: <ServicesPage /> },
 
             // User Auth Routes
@@ -79,14 +77,7 @@ const router = createBrowserRouter([
                 path: "/mentor-login",
                 element: <MentorDashboard />,
             },
-            {
-                path: "/mentor-profile",
-                element: <MentorProfilePage />,
-            },
-            {
-                path: "/mentor-bookings",
-                element: <MentorBooking />,
-            },
+         
 
             // Admin Portal
             {
