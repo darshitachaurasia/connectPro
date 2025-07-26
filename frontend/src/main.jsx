@@ -28,7 +28,7 @@ import AdminDashboard from "./pages/adminPortal/AdminDashboard.jsx";
 import BookingPage from "./pages/generalportal/BookingPage.jsx";
 import MentorDetails from "./pages/generalportal/MentorDetails.jsx";
 import BookingManagement from "./pages/adminPortal/BookingManagement.jsx";
-import TopMentors from "./components/TopMentors.jsx";
+
 
 const router = createBrowserRouter([
     {
@@ -43,7 +43,7 @@ const router = createBrowserRouter([
             { path: "/user-signup", element: <UserSignUp /> },
 
             // Mentor listing and services are open to all
-            { path: "/mentors", element: <TopMentors /> },
+            //{ path: "/mentors", element: <TopMentors /> },
             { path: "/service", element: <ServicesPage /> },
 
             // User Auth Routes
