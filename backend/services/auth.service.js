@@ -1,6 +1,6 @@
-const UserModel=require("../models/user.model");
-const ApiError=require("../helper/apiError");
-const httpStatus=require("../util/httpStatus");
+import UserModel from "../models/user.model.js";
+import ApiError from "../helper/apiError.js";
+import httpStatus from "../util/httpStatus.js";
 
 const createUser=async(data)=>{
     return await UserModel.create(data);
@@ -15,7 +15,4 @@ const loginUserWithEmailAndPassword=async(email,password)=>{
     return user;
 }
 
-module.exports={
-    createUser,
-    loginUserWithEmailAndPassword
-}
+export { createUser, loginUserWithEmailAndPassword };

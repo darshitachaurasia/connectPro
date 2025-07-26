@@ -1,6 +1,6 @@
-const ApiError = require("../helper/apiError");
-const mentorService=require("../services/mentor.service");
-const httpStatus = require("../util/httpStatus");
+import ApiError from "../helper/apiError";
+import mentorService from "../services/mentor.service";
+import httpStatus from "../util/httpStatus";
 
 const getAllMentors=async(req,res,next)=>{
     const mentors=await mentorService.getAllMentors();
@@ -26,8 +26,5 @@ const getMentorInfoByUsername=async(req,res,next)=>{
 }
 
 
-module.exports={
-    getAllMentors,
-    getMentorInfoByUsername
-}
+export { getAllMentors, getMentorInfoByUsername };
 

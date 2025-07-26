@@ -1,7 +1,7 @@
-const ServiceModel = require("../models/service.model");
-const httpStatus = require("../util/httpStatus");
-const ApiError = require("../helper/apiError");
-const serviceService = require("../services/service.service");
+import ServiceModel from "../models/service.model";
+import httpStatus from "../util/httpStatus";
+import ApiError from "../helper/apiError";
+import serviceService from "../services/service.service";
 
 const createService = async (req, res, next) => {
   try {
@@ -87,9 +87,4 @@ const getServiceById = async (req, res, next) => {
   });
 };
 
-module.exports = {
-  createService,
-  updateService,
-  getServiceByMentor,
-  getServiceById,
-};
+export { createService, updateService, getServiceByMentor, getServiceById };

@@ -1,5 +1,5 @@
-const UserModel = require("../models/user.model");
-const ServiceModel = require("../models/service.model");
+import UserModel from "../models/user.model.js";
+import ServiceModel from "../models/service.model.js";
 
 const getAllMentors = async () => {
     return await UserModel.find({ role: "mentor" });
@@ -17,8 +17,4 @@ const getMentorByUsername = async (username) => {
 
 }
 
-module.exports={
-    getAllMentors,
-    getMentorByUsername,
-    getMentorById
-}
+export { getAllMentors, getMentorByUsername, getMentorById };

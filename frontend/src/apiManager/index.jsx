@@ -1,43 +1,42 @@
-import axios from 'axios';
+import axios from "axios";
 import toast from "react-hot-toast";
 
-import { USER_STORE_PERSIST } from '../../../../frontend/src/const';
-import {BASE_URL} from '../../../../frontend/src/const/env.const';
-import { getToken,removeToken } from '../../../../frontend/src/helper';
+import { USER_STORE_PERSIST } from "../const";
+import { BASE_URL } from "../const/env.const";
+import { getToken, removeToken } from "../helper";
 
 
-let AxiosInstances;
+const AxiosInstance = axios.create({
+    baseURL: BASE_URL,
+});
 
-(()=>{
-    AxiosInstances=axios.create({
-        baseURL:BASE_URL
-    })
-
-
-AxiosInstances.interceptors.request.use((config)=>{
-    const token=getToken();
-    token && (config.headers.Authorization=`Bearer ${token}`);
+AxiosInstance.interceptors.request.use((config) => {
+    const token = getToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
-})
+});
 
-AxiosInstances.interceptors.response.use(
-    (response)=>response,
-    (error)=>{
-        if(error.response?.data.success==='false'){
-            const message=error.response.data.message;
-            message?toast.error(message):toast.error("Something went wrong");
-            if(error.response.status===401){
-                removeToken();
-                sessionStorage.removeItem(USER_STORE_PERSIST);
-                window.location.href="/signin";
+AxiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response) {
+            const { data, status } = error.response;
+            if (data && (data.success === false || data.success === "false")) {
+                const message = data.message;
+                message ? toast.error(message) : toast.error("Something went wrong");
+                if (status === 401) {
+                    removeToken();
+                    sessionStorage.removeItem(USER_STORE_PERSIST);
+                    window.location.href = "/signin";
+                }
+            } else {
+                toast.error("Something went wrong");
             }
-        }
-        else{
-            toast.error("something went wrong again")
+        } else {
+            toast.error("Network error or no response from server");
         }
         throw error;
     }
-)
-})();
+);
 
-export default AxiosInstances
+export default AxiosInstance;
