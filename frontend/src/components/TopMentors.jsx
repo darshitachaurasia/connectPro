@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+/**import React, { useEffect, useState } from 'react';
 import useMentorStore from '../redux/mentors';
 import mentorApi from '../apiManager/mentor';
 import MentorCard from './MentorCard';
@@ -63,4 +63,4 @@ const TopMentors = () => {
   )
 }
 
-export default TopMentors
+export default TopMentors**/
