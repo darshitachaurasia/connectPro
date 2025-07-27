@@ -1,4 +1,4 @@
-/**import AxiosInstances from ".";
+import AxiosInstances from ".";
 const getAllMentors=()=>{
     return AxiosInstances.get("/mentor");
 
@@ -13,4 +13,4 @@ const mentorApi={
     getMentorsByUsername,
 }
 
-export default mentorApi;*/
+export default mentorApi;

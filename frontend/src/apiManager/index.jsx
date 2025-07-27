@@ -1,4 +1,4 @@
-/**import axios from 'axios';
+import axios from 'axios';
 import toast from "react-hot-toast";
 
 import { USER_STORE_PERSIST } from '../../../../frontend/src/const';
@@ -40,4 +40,4 @@ AxiosInstances.interceptors.response.use(
 )
 })();
 
-export default AxiosInstances*/
+export default AxiosInstances

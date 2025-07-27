@@ -1,41 +1,40 @@
-const { required } = require("joi");
-const {Schema, model}=require("mongoose");
+import mongoose from "mongoose";
 
-const serviceSchema=new Schema(
+const { Schema, model } = mongoose;
+
+const serviceSchema = new Schema(
     {
-        mentor:{
-            type:Schema.Types.ObjectId,
-            ref:"User",
-            required:true
+        mentor: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true
         },
-        serviceName:{
-            type:Schema.Types.String,
-            required:true,
-            trim:true
+        serviceName: {
+            type: String,  // ✅ Use `String` directly, not `Schema.Types.String`
+            required: true,
+            trim: true
         },
-        
-        description:{
-            type:Schema.Types.String,
-            required:true,
-            trim:true
+        description: {
+            type: String,
+            required: true,
+            trim: true
         },
-        duration:{
-            type:Schema.Types.Number,
-            required:true,
-            trim:true
+        duration: {
+            type: Number,  // ✅ Use `Number` directly
+            required: true
         },
-        price:{
-            type:Schema.Types.Number,
-            required:true,
-            trim:true
+        price: {
+            type: Number,
+            required: true
         },
-        active:{
-            type:Schema.Types.Boolean,
-            default:false,
+        active: {
+            type: Boolean,
+            default: false
         }
-    },{timestamps:true}
+    },
+    { timestamps: true }
 );
 
-const ServiceModel=model("Service",serviceSchema);
+const ServiceModel = mongoose.models.Service || model("Service", serviceSchema);
 
-module.exports=ServiceModel;
+export default ServiceModel;

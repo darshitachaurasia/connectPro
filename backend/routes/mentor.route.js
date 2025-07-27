@@ -1,11 +1,10 @@
 import { Router } from "express";
-const mentorController =require("../../controllers/mentor.controller");
-const asyncHandler=require("../../helper/asyncHandler");
+import * as mentorController from "../controllers/mentor.controller.js";
+import asyncHandler from "../utils/asyncHandler.js"
 
-const mentorRouter=Router();
+const mentorRouter = Router();
 
-router.get("/",asyncHandler(mentorController.getAllMentors))
-router.get("/:username",asyncHandler(mentorController.getMentorinfoByUsername))
-
+mentorRouter.get("/", asyncHandler(mentorController.getAllMentors));
+mentorRouter.get("/:username", asyncHandler(mentorController.getMentorInfoByUsername));
 
 export default mentorRouter;

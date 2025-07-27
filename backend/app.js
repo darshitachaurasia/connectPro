@@ -4,6 +4,7 @@ import cors from 'cors';
 import authRouter from './routes/auth.route.js';
 import userRouter from './routes/user.route.js';
 import ApiError from "./utils/ApiError.js";
+import mentorRouter from './routes/mentor.route.js';
 
 // app config
 const app = express();
@@ -19,6 +20,7 @@ app.use(cookieParser());
 // Auth routes
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/mentor', mentorRouter);
 
 app.get('/', (req, res) => {
     res.send('Welcome to the backend server!');

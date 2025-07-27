@@ -1,24 +1,17 @@
-const UserModel = require("../models/user.model");
-const ServiceModel = require("../models/service.model");
+import UserModel from "../models/user.model.js";
+import ServiceModel from "../models/service.model.js";
 
-const getAllMentors = async () => {
+export const getAllMentors = async () => {
     return await UserModel.find({ role: "mentor" });
 };
 
-const getMentorById = async (id) => {
+export const getMentorById = async (id) => {
     return await UserModel.findOne({ _id: id, role: "mentor" });
 };
 
-const getMentorByUsername = async (username) => {
-    const mentor = await UserModel.findOne({ username, role: "mentor" });
+export const getMentorByFullname = async (fullname) => {
+    const mentor = await UserModel.findOne({ fullname, role: "mentor" });
     if (!mentor) return null;
     console.log("Mentor found: ", mentor);
     return mentor;
-
-}
-
-module.exports={
-    getAllMentors,
-    getMentorByUsername,
-    getMentorById
-}
+};
