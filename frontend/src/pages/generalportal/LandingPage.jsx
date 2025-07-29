@@ -2,7 +2,7 @@ import React from 'react';
 import mentor from './assets/mentor.png';
 import { NavLink } from 'react-router-dom';
 import ServicesPage from './ServicesPage';
-
+import TopMentors from '../../components/TopMentors';
 const LandingPage = () => {
   return (
     <>
@@ -74,17 +74,18 @@ const LandingPage = () => {
                     className="inline-flex items-center justify-center w-full sm:w-auto h-12 px-8 mb-4 sm:mb-0 font-medium tracking-wide text-white bg-blue-500 rounded-md shadow-lg hover:bg-blue-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300"
                     disabled
                   >
-                    Join ConnectPro
+                    Start Career Quiz
                   </button>
                   <a
                     href="/learn-more"
                     aria-label="Learn more about ConnectPro"
-                    className="inline-flex items-center justify-center font-semibold text-blue-600 transition-colors duration-200 hover:text-blue-700"
+                    className="pl-4 inline-flex items-center justify-center font-semibold text-blue-600 transition-colors duration-200 hover:text-blue-700"
                   >
                     Discover More
-                    <svg className="inline-block w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 16 16">
-                      <path d="M11.742 10.742a6.5 6.5 0 1 0-1.414 1.414..."/>
-                    </svg>
+                   <svg className="inline-block w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8.293 12.293a1 1 0 0 1 1.414 0l4-4a1 1 0 0 0 0-1.414l-4-4a1 1 0 1 1 1.414-1.414l4.707 4.707a2 2 0 0 1 0 2.828l-4.707 4.707a1 1 0 0 1-1.414-1.414z"/>
+</svg>
+
                   </a>
                 </div>
               </div>
@@ -191,9 +192,10 @@ const LandingPage = () => {
                 </p>
                 <a className="inline-flex items-center px-6 py-3 mt-6 text-white transition duration-300 bg-blue-500 rounded-md shadow-md hover:bg-blue-600 hover:shadow-lg">
                   Get Started
-                  <svg className="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 12 12">
-                    <path d="M9.707,5.293l-5-5..."/>
-                  </svg>
+                  <svg className="w-4 h-4 ml-2" fill="currentColor" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+</svg>
+
                 </a>
               </div>
               <div className="grid flex-grow grid-cols-2 gap-6 md:grid-cols-3">
@@ -223,7 +225,11 @@ const LandingPage = () => {
            
           </div>
         </section>
-
+   <section>
+    <div>
+      <TopMentors/>
+    </div>
+   </section>
        
         {/* Pricing Section */}
         <section className="px-10 py-24 text-center bg-blue-50">

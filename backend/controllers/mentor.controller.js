@@ -1,30 +1,34 @@
-import ApiError from "../helper/apiError";
-import mentorService from "../services/mentor.service";
-import httpStatus from "../util/httpStatus";
+import ApiError from "../utils/ApiError.js";
+import * as mentorService from "../services/mentor.service.js";
+import httpStatus from "../utils/httpStatus.js";
 
-const getAllMentors=async(req,res,next)=>{
-    const mentors=await mentorService.getAllMentors();
-    res.status(httpStatus.ok).json({
-        success:true,
-        mentors
-    })
-
-}
-
-
-const getMentorInfoByUsername=async(req,res,next)=>{
-    const {username}=req.params;
-    const mentor=await mentorService.getMentorByUsername(username);
-    if(!mentor){
-        return next(new ApiError(httpStatus.notFound,"Mentor not found"));
+export const getAllMentors = async (req, res, next) => {
+    try {
+        const mentors = await mentorService.getAllMentors();
+        if (!mentors || mentors.length === 0) {
+            return next(new ApiError(httpStatus.notFound, "No mentors found"));
+        }
+        res.status(httpStatus.ok).json({
+            success: true,
+            mentors
+        });
+    } catch (error) {
+        next(error);
     }
-    res.status(httpStatus.ok).json({
-        success:true,
-        mentor
-    })
+};
 
-}
-
-
-export { getAllMentors, getMentorInfoByUsername };
-
+export const getMentorInfoByUsername = async (req, res, next) => {
+    try {
+        const { username } = req.params;
+        const mentor = await mentorService.getMentorByUsername(username);
+        if (!mentor) {
+            return next(new ApiError(httpStatus.notFound, "Mentor not found"));
+        }
+        res.status(httpStatus.ok).json({
+            success: true,
+            mentor
+        });
+    } catch (error) {
+        next(error);
+    }
+};

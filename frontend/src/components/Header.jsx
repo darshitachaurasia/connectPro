@@ -38,6 +38,7 @@ function Header() {
                   >
                     {item.name}
                   </button>
+                  <SideBar />
                 </li>
               )
           )}
@@ -51,8 +52,8 @@ function Header() {
         </ul>
 
         {/* ✅ Sidebar (for small screens) */}
-        <div className="md:hidden">
-          <SideBar />
+        <div className="mt-0">
+          
         </div>
       </nav>
     </header>
