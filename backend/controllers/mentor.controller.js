@@ -20,7 +20,7 @@ export const getAllMentors = async (req, res, next) => {
 export const getMentorInfoByUsername = async (req, res, next) => {
     try {
         const { username } = req.params;
-        const mentor = await mentorService.getMentorByUsername(username);
+        const mentor = await mentorService.getMentorById(username);
         if (!mentor) {
             return next(new ApiError(httpStatus.notFound, "Mentor not found"));
         }

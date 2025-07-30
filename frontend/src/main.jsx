@@ -19,6 +19,7 @@ import UserSignUp from "./pages/generalportal/UserSignUp.jsx";
 import UserManagementPage from "./pages/adminPortal/UserManagementPage.jsx";
 import MentorManagement from "./pages/adminPortal/MentorManagement.jsx";
 import BookingDetails from "./pages/generalportal/BookingDetails";
+import TopMentors from "./components/TopMentors.jsx";
 
 import UserDashboard from "./pages/generalportal/UserDashboard.jsx";
 import MentorDashboard from "./pages/mentorPortal/MentorDashboard.jsx";
@@ -43,7 +44,7 @@ const router = createBrowserRouter([
             { path: "/user-signup", element: <UserSignUp /> },
 
             // Mentor listing and services are open to all
-            //{ path: "/mentors", element: <TopMentors /> },
+            { path: "/mentors", element: <TopMentors /> },
             { path: "/service", element: <ServicesPage /> },
 
             // User Auth Routes
