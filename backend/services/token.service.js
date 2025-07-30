@@ -1,6 +1,6 @@
-const jwt=require("jsonwebtoken");
-const moment=require("moment");
-const config=require("../config");
+import jwt from "jsonwebtoken";
+import moment from "moment";
+import config from "../config/index.js";
 
 const generateToken=(userId,expires,secret)=>{
     const payload={
@@ -41,4 +41,4 @@ const generateToken=(userId,expires,secret)=>{
     }
  }
 
- module.exports={generateAuthTokens,verifyToken,generateVerificationToken}
+export { generateAuthTokens, verifyToken, generateVerificationToken };

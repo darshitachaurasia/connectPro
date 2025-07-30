@@ -1,4 +1,4 @@
-const Joi = require("joi");
+import Joi from "joi";
 
 const updateUserProfileValidation = Joi.object({
   tags: Joi.array().items(Joi.string()).optional(),
@@ -14,6 +14,4 @@ const updateUserProfileValidation = Joi.object({
   college: Joi.string().optional(),
 });
 
-module.exports = {
-  updateUserProfileValidation,
-};
+export { updateUserProfileValidation };

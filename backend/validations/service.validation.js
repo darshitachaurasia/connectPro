@@ -1,7 +1,7 @@
-const Joi = require("joi");
+import Joi from "joi";
+
 
 const createServiceSchema = Joi.object({
-    
   name: Joi.string().optional(),
   description: Joi.string().optional(),
   duration: Joi.string().optional(),
@@ -9,6 +9,4 @@ const createServiceSchema = Joi.object({
   active: Joi.string().optional(),
 });
 
-module.exports = {
-  updateUserProfileValidation,
-};
+export { createServiceSchema };

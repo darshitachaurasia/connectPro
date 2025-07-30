@@ -1,4 +1,4 @@
-const UserModel=require("../models/user.model");
+import UserModel from "../models/user.model.js";
 
 const getUserById=async(id)=>{
     return await UserModel.findById(id);
@@ -20,9 +20,4 @@ const updateUserProfile=async(id,profileData)=>{
     );
 };
 
-module.exports={
-    getUserById,
-    updateUser,
-    updateUserPhoto,
-    updateUserProfile
-}
+export { getUserById, updateUser, updateUserPhoto, updateUserProfile };

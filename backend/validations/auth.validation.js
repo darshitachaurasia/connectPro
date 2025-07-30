@@ -1,4 +1,4 @@
-const Joi=require('joi');
+import Joi from 'joi';
 
 
 const signUpValidation=Joi.object().keys({
@@ -14,4 +14,4 @@ const signInValidation=Joi.object().keys({
     password:Joi.string().required(),
 })
 
-module.exports={signInValidation,signUpValidation}
+export { signInValidation, signUpValidation };

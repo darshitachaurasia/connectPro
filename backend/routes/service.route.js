@@ -1,26 +1,30 @@
 import { Router } from "express";
-const serviceController = require("../../controllers/service.controller");
-const asyncHandler = require("../../helper/asyncHandler");
-const validate = require("../../middleware/validate");
-const authMiddleware = require("../../middleware/auth")
+import * as serviceController from "../../controllers/service.controller.js";
+import asyncHandler from "../../helper/asyncHandler.js";
+import validate from "../../middleware/validate.js";
+import authMiddleware from "../../middleware/auth.js";
+// import createServiceSchema from the appropriate location if needed
+
 const serviceRouter = Router();
-router.post("/", validate(createServiceSchema), authMiddleware.protect, 
-                            authMiddleware.restricTo("mentor"),
-                            asyncHandler(serviceController.createService))
 
-router.post("/:serviceId", validate(createServiceSchema), authMiddleware.protect, 
-                            authMiddleware.restricTo("mentor"),
-                            asyncHandler(serviceController.updateService))
+// You need to import or define createServiceSchema for validation to work
+// import createServiceSchema from "../../schemas/service.schema.js";
 
-router.get("/", authMiddleware.protect, 
-                            authMiddleware.restricTo("mentor"),
-                            asyncHandler(serviceController.getServiceByMentor))
+serviceRouter.post("/", validate(createServiceSchema), authMiddleware.protect, 
+    authMiddleware.restricTo("mentor"),
+    asyncHandler(serviceController.createService));
 
-router.get("/:serviceId", authMiddleware.protect, 
-                                authMiddleware.restricTo("mentor"),
-                                asyncHandler(serviceController.getServiceById));
+serviceRouter.post("/:serviceId", validate(createServiceSchema), authMiddleware.protect, 
+    authMiddleware.restricTo("mentor"),
+    asyncHandler(serviceController.updateService));
 
+serviceRouter.get("/", authMiddleware.protect, 
+    authMiddleware.restricTo("mentor"),
+    asyncHandler(serviceController.getServiceByMentor));
 
+serviceRouter.get("/:serviceId", authMiddleware.protect, 
+    authMiddleware.restricTo("mentor"),
+    asyncHandler(serviceController.getServiceById));
 
 export default serviceRouter;
     
