@@ -1,30 +1,43 @@
 import { Router } from "express";
-import * as serviceController from "../../controllers/service.controller.js";
-import asyncHandler from "../../helper/asyncHandler.js";
-import validate from "../../middleware/validate.js";
-import authMiddleware from "../../middleware/auth.js";
-// import createServiceSchema from the appropriate location if needed
+import * as serviceController from "../controllers/service.controller.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import verifyJWT from "../middlewares/auth.js";  // ✅ Updated import
 
 const serviceRouter = Router();
 
-// You need to import or define createServiceSchema for validation to work
-// import createServiceSchema from "../../schemas/service.schema.js";
+// ✅ Create Service
+serviceRouter.post(
+  "/",
+  verifyJWT, // ✅ Authentication middleware
+  asyncHandler(serviceController.createService)
+);
 
-serviceRouter.post("/", validate(createServiceSchema), authMiddleware.protect, 
-    authMiddleware.restricTo("mentor"),
-    asyncHandler(serviceController.createService));
+// ✅ Update Service
+serviceRouter.put(
+  "/:serviceId",
+  verifyJWT,
+  asyncHandler(serviceController.updateService)
+);
 
-serviceRouter.post("/:serviceId", validate(createServiceSchema), authMiddleware.protect, 
-    authMiddleware.restricTo("mentor"),
-    asyncHandler(serviceController.updateService));
+// ✅ Get all services for a mentor
+serviceRouter.get(
+  "/",
+  verifyJWT,
+  asyncHandler(serviceController.getServiceByMentor)
+);
 
-serviceRouter.get("/", authMiddleware.protect, 
-    authMiddleware.restricTo("mentor"),
-    asyncHandler(serviceController.getServiceByMentor));
+// ✅ Get service by ID
+serviceRouter.get(
+  "/:serviceId",
+  verifyJWT,
+  asyncHandler(serviceController.getServiceById)
+);
 
-serviceRouter.get("/:serviceId", authMiddleware.protect, 
-    authMiddleware.restricTo("mentor"),
-    asyncHandler(serviceController.getServiceById));
+// ✅ Delete service
+serviceRouter.delete(
+  "/:serviceId",
+  verifyJWT,
+  asyncHandler(serviceController.deleteService)
+);
 
 export default serviceRouter;
-    

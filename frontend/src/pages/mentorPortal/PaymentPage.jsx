@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import paymentApi from "../../apiManger/payment"; // Use the default exported API manager
+import paymentApi from "../../apiManager/payment"; // Use the default exported API manager
 
 const PaymentPage = () => {
   const location = useLocation();

@@ -1,37 +1,50 @@
 import { Link } from 'react-router-dom';
-import { MdPerson, MdEventNote } from 'react-icons/md';
+import { MdPerson, MdEventNote, MdBuild } from 'react-icons/md';
 
 export default function MentorDashboard() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0c0822] to-[#2d0727] text-white px-8 py-14">
-      <h1 className="text-4xl font-bold mb-16 text-center text-pink-300">Mentor Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 px-8 py-14">
+      <h1 className="text-4xl font-bold mb-16 text-center text-blue-800">
+        Mentor Dashboard
+      </h1>
 
-      <div className="grid grid-cols-2 gap-12 place-items-center max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 place-items-center max-w-5xl mx-auto">
         <MentorIconCard
           icon={<MdPerson size={60} />}
           label="My Profile"
-          to='/mentor-profile'
+          to="/profile"
+          bg="from-blue-100 to-blue-200"
+          hover="hover:from-blue-200 hover:to-blue-300"
         />
         <MentorIconCard
           icon={<MdEventNote size={60} />}
           label="Bookings"
-          to='/mentor-bookings'
+          to="/mentor-bookings"
+          bg="from-blue-100 to-blue-200"
+          hover="hover:from-blue-200 hover:to-blue-300"
+        />
+        <MentorIconCard
+          icon={<MdBuild size={60} />}
+          label="Services"
+          to="/mentor-services"
+          bg="from-blue-100 to-blue-200"
+          hover="hover:from-blue-200 hover:to-blue-300"
         />
       </div>
     </div>
   );
 }
 
-function MentorIconCard({ icon, label, to }) {
+function MentorIconCard({ icon, label, to, bg, hover }) {
   return (
     <Link
       to={to}
-      className="group flex flex-col items-center justify-center w-40 h-40 md:w-52 md:h-52 rounded-full bg-white/10 hover:bg-pink-600/30 transition-all duration-300 shadow-xl hover:scale-105"
+      className={`group flex flex-col items-center justify-center w-44 h-44 md:w-52 md:h-52 rounded-2xl bg-gradient-to-br ${bg} ${hover} shadow-md transition-all duration-300 hover:scale-105`}
     >
-      <div className="text-white mb-2 group-hover:text-pink-300">
+      <div className="text-blue-600 mb-2 group-hover:text-blue-800">
         {icon}
       </div>
-      <p className="text-sm md:text-base text-gray-300 mt-2 group-hover:text-white font-semibold">
+      <p className="text-base md:text-lg text-blue-700 group-hover:text-blue-900 font-semibold">
         {label}
       </p>
     </Link>

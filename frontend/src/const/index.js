@@ -1,2 +1,4 @@
-export const USER_STORE_PERSIST="xc8vj*>t6g7";
-export const TOKEN="5fshgbs*>TUbXxuh";
+export const USER_STORE_PERSIST = import.meta.env.VITE_USER_STORE_PERSIST;
+export const TOKEN = import.meta.env.VITE_TOKEN;
+
+

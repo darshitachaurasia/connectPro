@@ -25,4 +25,4 @@ const getServiceById=async(serviceId)=>{
 return await ServiceModel.findById(serviceId)
 };
 
-export { createService, updateService, getServiceByMentor, getServiceById };
+export default { createService, updateService, getServiceByMentor, getServiceById };

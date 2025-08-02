@@ -1,7 +1,6 @@
-import ServiceModel from "../models/service.model";
-import httpStatus from "../util/httpStatus";
-import ApiError from "../helper/apiError";
-import serviceService from "../services/service.service";
+import httpStatus from "../utils/httpStatus.js";
+import ApiError from "../utils/ApiError.js";
+import serviceService from "../services/service.service.js";
 
 const createService = async (req, res, next) => {
   try {
@@ -22,13 +21,13 @@ const createService = async (req, res, next) => {
       service,
     });
   } catch (error) {
-    next(error);  // Pass the error to the global error handler
+    next(error);
   }
 };
 
 const updateService = async (req, res, next) => {
   try {
-    const serviceId = req.params.serviceId;
+    const { serviceId } = req.params;
     const mentorId = req.user._id;
     const { name, description, duration, price, active } = req.body;
 
@@ -39,10 +38,7 @@ const updateService = async (req, res, next) => {
     );
 
     if (!updatedService) {
-      throw new ApiError(
-        httpStatus.notFound,
-        "Service not found"
-      );
+      throw new ApiError(httpStatus.notFound, "Service not found");
     }
 
     res.status(httpStatus.ok).json({
@@ -51,7 +47,7 @@ const updateService = async (req, res, next) => {
       service: updatedService,
     });
   } catch (error) {
-    next(error);  // Pass the error to the global error handler
+    next(error);
   }
 };
 
@@ -60,31 +56,57 @@ const getServiceByMentor = async (req, res, next) => {
     const mentorId = req.user._id;
     const services = await serviceService.getServiceByMentor(mentorId);
 
-    if (!services || services.length === 0) {
-      return res.status(httpStatus.notFound).json({
-        success: false,
-        message: "No services found for this mentor",
-      });
-    }
-
     res.status(httpStatus.ok).json({
       success: true,
       services,
     });
   } catch (error) {
-    next(error);  // Pass the error to the global error handler
+    next(error);
   }
 };
 
-
 const getServiceById = async (req, res, next) => {
-  const serviceId = req.params.serviceId;
-  const service = await serviceService.getServiceById(serviceId);
+  try {
+    const { serviceId } = req.params;
+    const service = await serviceService.getServiceById(serviceId);
 
-  res.status(httpStatus.ok).json({
-    success: true,
-    service,
-  });
+    if (!service) {
+      throw new ApiError(httpStatus.notFound, "Service not found");
+    }
+
+    res.status(httpStatus.ok).json({
+      success: true,
+      service,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export { createService, updateService, getServiceByMentor, getServiceById };
+const deleteService = async (req, res, next) => {
+  try {
+    const { serviceId } = req.params;
+    const mentorId = req.user._id;
+
+    const deleted = await serviceService.deleteService(serviceId, mentorId);
+
+    if (!deleted) {
+      throw new ApiError(httpStatus.notFound, "Service not found or not authorized");
+    }
+
+    res.status(httpStatus.ok).json({
+      success: true,
+      message: "Service deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {
+  createService,
+  updateService,
+  getServiceByMentor,
+  getServiceById,
+  deleteService,
+};
