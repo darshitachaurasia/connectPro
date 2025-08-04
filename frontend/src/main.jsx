@@ -28,6 +28,7 @@ import AdminDashboard from "./pages/adminPortal/AdminDashboard.jsx";
 import BookingPage from "./pages/generalportal/BookingPage.jsx";
 import MentorDetails from "./pages/generalportal/MentorDetails.jsx";
 import BookingManagement from "./pages/adminPortal/BookingManagement.jsx";
+import LearnHeader from "./pages/generalportal/Learn.jsx";
 
 
 const router = createBrowserRouter([
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
             {
                 path: "/profile",
                 element: <UserProfile />,
+            },
+             {
+                path: "/Learn",
+                element: <LearnHeader />,
             },
             {
                 path: "/verify-email",
