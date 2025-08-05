@@ -1,97 +1,86 @@
-function ServicesPage() {
+import { Link, useNavigate } from "react-router-dom";
+
+const services = [
+  {
+    title: "Expert Career Guidance",
+    icon: "👨‍🏫",
+    description: "Get personalized insights from experienced mentors to navigate your career path effectively.",
+  },
+  {
+    title: "Personalized Learning Paths",
+    icon: "🌱",
+    description: "Customized roadmaps designed to align with your goals, strengths, and interests.",
+  },
+  {
+    title: "Build Valuable Networks",
+    icon: "🔗",
+    description: "Connect with peers, professionals, and industry leaders to grow your circle.",
+  },
+  {
+    title: "Continuous Progress Tracking",
+    icon: "📈",
+    description: "Stay updated on your learning journey with detailed progress insights and feedback.",
+  },
+  {
+    title: "Global Mentorship Opportunities",
+    icon: "🌍",
+    description: "Access mentorship from experts across the world, expanding your perspectives and reach.",
+  },
+];
+
+export default function ServicesPage() {
+  const navigate = useNavigate();
+
   return (
-    <section className="bg-[#f8f9fa] px-4 py-8">
-                        <div className="max-w-screen-xl mx-auto px-6 lg:px-16 py-16">
-                            <div className="text-center mb-12">
-                                <h2 className="text-4xl font-bold text-gray-900 mb-6">
-                                    Unlock Your Growth Journey with ConnectPro
-                                </h2>
-                                <p className="text-lg text-gray-600">
-                                    ConnectPro is designed to connect you with the right mentors, guiding you to success. Whether it's enhancing your skills or reaching career goals, we’re here to help you thrive.
-                                </p>
-                            </div>
-    
-                            <div className="grid gap-8 row-gap-10 md:grid-cols-2 lg:grid-cols-3">
-                                <div className="max-w-md text-center bg-white p-8 rounded-lg shadow-xl transition-transform transform hover:scale-105">
-                                    <h6 className="text-xl font-semibold text-gray-900 mb-3">Expert Career Guidance</h6>
-                                    <p className="text-sm text-gray-700 mb-4">
-                                        Gain career insights and advice from seasoned mentors. Receive support for resume building, job interviews, and navigating your professional growth.
-                                    </p>
-                                    <a
-                                        href="/"
-                                        className="text-teal-600 hover:text-teal-700 font-semibold transition-colors duration-200"
-                                    >
-                                        Learn More
-                                    </a>
-                                </div>
-    
-                                <div className="max-w-md text-center bg-white p-8 rounded-lg shadow-xl transition-transform transform hover:scale-105">
-                                    <h6 className="text-xl font-semibold text-gray-900 mb-3">Personalized Learning Paths</h6>
-                                    <p className="text-sm text-gray-700 mb-4">
-                                        Our mentors design personalized learning plans that cater to your unique goals, helping you stay focused and motivated throughout your journey.
-                                    </p>
-                                    <a
-                                        href="/"
-                                        className="text-teal-600 hover:text-teal-700 font-semibold transition-colors duration-200"
-                                    >
-                                        Learn More
-                                    </a>
-                                </div>
-    
-                                <div className="max-w-md text-center bg-white p-8 rounded-lg shadow-xl transition-transform transform hover:scale-105">
-                                    <h6 className="text-xl font-semibold text-gray-900 mb-3">Affordable and Flexible</h6>
-                                    <p className="text-sm text-gray-700 mb-4">
-                                        ConnectPro ensures that mentorship is accessible to all. Choose flexible and affordable mentoring sessions that fit your budget and schedule.
-                                    </p>
-                                    <a
-                                        href="/"
-                                        className="text-teal-600 hover:text-teal-700 font-semibold transition-colors duration-200"
-                                    >
-                                        Learn More
-                                    </a>
-                                </div>
-    
-                                <div className="max-w-md text-center bg-white p-8 rounded-lg shadow-xl transition-transform transform hover:scale-105">
-                                    <h6 className="text-xl font-semibold text-gray-900 mb-3">Build Valuable Networks</h6>
-                                    <p className="text-sm text-gray-700 mb-4">
-                                        Mentorship opens doors to valuable networking opportunities. Build lasting relationships with mentors and professionals in your field.
-                                    </p>
-                                    <a
-                                        href="/"
-                                        className="text-teal-600 hover:text-teal-700 font-semibold transition-colors duration-200"
-                                    >
-                                        Learn More
-                                    </a>
-                                </div>
-    
-                                <div className="max-w-md text-center bg-white p-8 rounded-lg shadow-xl transition-transform transform hover:scale-105">
-                                    <h6 className="text-xl font-semibold text-gray-900 mb-3">Continuous Progress Tracking</h6>
-                                    <p className="text-sm text-gray-700 mb-4">
-                                        Monitor your progress and achievements with the help of our built-in tools, which make goal-setting and tracking easy and motivating.
-                                    </p>
-                                    <a
-                                        href="/"
-                                        className="text-teal-600 hover:text-teal-700 font-semibold transition-colors duration-200"
-                                    >
-                                        Learn More
-                                    </a>
-                                </div>
-    
-                                <div className="max-w-md text-center bg-white p-8 rounded-lg shadow-xl transition-transform transform hover:scale-105">
-                                    <h6 className="text-xl font-semibold text-gray-900 mb-3">Global Mentorship Opportunities</h6>
-                                    <p className="text-sm text-gray-700 mb-4">
-                                        With ConnectPro, you can connect with mentors from across the globe. Gain diverse perspectives and expand your horizons with international opportunities.
-                                    </p>
-                                    <a
-                                        href="/"
-                                        className="text-teal-600 hover:text-teal-700 font-semibold transition-colors duration-200"
-                                    >
-                                        Learn More
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+    <div className="relative min-h-screen bg-blue-900 text-white overflow-x-hidden">
+      {/* Background overlay */}
+      <div className="absolute inset-0 -z-10">
+        <img
+          src="/background.jpg" // Replace with your image path
+          alt="Team"
+          className="w-full h-full object-cover opacity-30"
+        />
+      </div>
+
+      {/* Header */}
+      <div className="px-6 md:px-20 pt-16 pb-10 text-center">
+        <h1 className="text-3xl md:text-5xl font-bold mb-4">
+          Unlock Your Growth Journey <br className="hidden md:block" />
+          with ConnectPro
+        </h1>
+        <p className="max-w-2xl mx-auto text-base md:text-lg text-gray-300">
+          We offer tailored mentorship services designed to help you learn, grow,
+          and achieve your professional dreams.
+        </p>
+      </div>
+
+      {/* Service Highlights */}
+      <div className="text-center text-2xl font-semibold mb-6">Service Highlights</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 md:px-20 pb-10">
+        {services.map((service, index) => (
+          <div
+            key={index}
+            onClick={() => navigate("/homepage")}
+            className="bg-white text-black rounded-2xl shadow-lg p-6 cursor-pointer hover:shadow-2xl transition-all duration-300"
+          >
+            <div className="text-4xl mb-4">{service.icon}</div>
+            <h3 className="text-xl font-bold mb-2">{service.title}</h3>
+            <p className="text-sm text-gray-700 mb-4">{service.description}</p>
+            <button className="border border-black px-3 py-1 rounded hover:bg-black hover:text-white transition">
+              Learn More
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA Button */}
+      <div className="flex justify-center pb-12">
+        <Link to="/homepage">
+          <div className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-6 py-3 rounded-full">
+            Start Your Journey
+          </div>
+        </Link>
+      </div>
+    </div>
   );
 }
-export default ServicesPage;

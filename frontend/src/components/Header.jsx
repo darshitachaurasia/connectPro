@@ -13,6 +13,7 @@ function Header() {
     { name: 'Login', slug: '/login', active: !authUser },
     { name: 'SignUp', slug: '/signup', active: !authUser },
     { name: 'Services', slug: '/service', active: true },
+    {name : 'Resources',slug :'/Learn', active :true},
   ];
 
   return (
