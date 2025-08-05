@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Table, Button, Input, Space } from "antd";
-import { AiOutlineDollarCircle } from "react-icons/ai";
-import Dashboard from "../generalportal/dashboard/dashboard"; // Assuming the Dashboard layout is used for consistent structure
+import { AiOutlineDollarCircle } from "react-icons/ai"; // Assuming the Dashboard layout is used for consistent structure
 import { MdOutlineCurrencyRupee } from "react-icons/md";
 import * as XLSX from "xlsx"; // Import xlsx library
 
-const Payment = () => {
+const MentorPayment = () => {
   // Hardcoded payment data (you can replace it later with real data)
   const paymentHistory = [
     {
@@ -133,7 +132,7 @@ const Payment = () => {
   };
 
   return (
-    <Dashboard>
+    
       <div className="p-6 bg-white rounded-lg shadow-lg">
         <div className="flex items-center mb-4">
           <MdOutlineCurrencyRupee className="mr-2 text-3xl text-orange-500" />
@@ -179,7 +178,7 @@ const Payment = () => {
           </Button>
         </div>
       </div>
-    </Dashboard>
+   
   );
 };
 
