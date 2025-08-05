@@ -1,26 +1,43 @@
 import { Router } from "express";
-const serviceController = require("../../controllers/service.controller");
-const asyncHandler = require("../../helper/asyncHandler");
-const validate = require("../../middleware/validate");
-const authMiddleware = require("../../middleware/auth")
+import * as serviceController from "../controllers/service.controller.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import verifyJWT from "../middlewares/auth.js";  // ✅ Updated import
+
 const serviceRouter = Router();
-router.post("/", validate(createServiceSchema), authMiddleware.protect, 
-                            authMiddleware.restricTo("mentor"),
-                            asyncHandler(serviceController.createService))
 
-router.post("/:serviceId", validate(createServiceSchema), authMiddleware.protect, 
-                            authMiddleware.restricTo("mentor"),
-                            asyncHandler(serviceController.updateService))
+// ✅ Create Service
+serviceRouter.post(
+  "/",
+  verifyJWT, // ✅ Authentication middleware
+  asyncHandler(serviceController.createService)
+);
 
-router.get("/", authMiddleware.protect, 
-                            authMiddleware.restricTo("mentor"),
-                            asyncHandler(serviceController.getServiceByMentor))
+// ✅ Update Service
+serviceRouter.put(
+  "/:serviceId",
+  verifyJWT,
+  asyncHandler(serviceController.updateService)
+);
 
-router.get("/:serviceId", authMiddleware.protect, 
-                                authMiddleware.restricTo("mentor"),
-                                asyncHandler(serviceController.getServiceById));
+// ✅ Get all services for a mentor
+serviceRouter.get(
+  "/",
+  verifyJWT,
+  asyncHandler(serviceController.getServiceByMentor)
+);
 
+// ✅ Get service by ID
+serviceRouter.get(
+  "/:serviceId",
+  verifyJWT,
+  asyncHandler(serviceController.getServiceById)
+);
 
+// ✅ Delete service
+serviceRouter.delete(
+  "/:serviceId",
+  verifyJWT,
+  asyncHandler(serviceController.deleteService)
+);
 
 export default serviceRouter;
-    

@@ -1,9 +1,9 @@
 import { Router } from "express";
+import * as paymentController from "../../controllers/payment.controller.js";
+
 const paymentRouter = Router();
-const paymentController = require("../../controllers/payment.controller");
 
-router.post("/create-order", paymentController.createOrder);
-router.post("/verify-payment", paymentController.verifyPayment);
-
+paymentRouter.post("/create-order", paymentController.createOrder);
+paymentRouter.post("/verify-payment", paymentController.verifyPayment);
 
 export default paymentRouter;
