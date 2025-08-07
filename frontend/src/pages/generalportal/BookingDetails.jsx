@@ -1,87 +1,40 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { fetchBookingsByUser } from '../../redux/bookingSlice';
-import { motion } from 'framer-motion';
-import { getCurrentUser } from '../../redux/authSlice';
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {  fetchUserBookings } from "../../redux/bookingSlice";
+import { motion } from "framer-motion";
 
 export default function BookingDetails() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const bookings = useSelector((state) => state.booking.list);
-  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    if (!user) {
-       dispatch(getCurrentUser());
-    } else {
-      dispatch(fetchBookingsByUser(user.$id));
-    }
-  }, [ navigate, dispatch]);
-
-  const userBookings = bookings.filter((b) => b.userId === user?.$id);
+    dispatch(fetchUserBookings());
+  }, [dispatch]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 to-blue-700 text-white py-12 px-6 flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white text-blue-800 py-12 px-6">
       <motion.h2
-        className="text-4xl font-bold text-blue-300 mb-10 text-center"
+        className="text-4xl font-bold mb-10 text-center"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
         Your Bookings
       </motion.h2>
-
-      {userBookings.length === 0 ? (
-        <motion.p
-          className="text-lg text-gray-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          No bookings found.
-        </motion.p>
+      {bookings.length === 0 ? (
+        <p className="text-center text-gray-500">No bookings found.</p>
       ) : (
-        <motion.ul
-          className="space-y-6 w-full max-w-3xl"
-          initial="hidden"
-          animate="visible"
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { delayChildren: 0.2, staggerChildren: 0.1 },
-            },
-          }}
-        >
-          {userBookings.map((booking) => (
-            <motion.li
-              key={booking.$id}
-              className="bg-[#1e0e2f] border border-white/10 p-6 rounded-xl shadow-lg"
-              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-            >
-              <p className="mb-1">
-                <span className="text-blue-200 font-medium">Service:</span>{' '}
-                {booking.service}
-              </p>
-              <p className="mb-1">
-                <span className="text-blue-200 font-medium">Mentor ID:</span>{' '}
-                {booking.mentorId}
-              </p>
-              <p className="mb-1">
-                <span className="text-blue-200 font-medium">Date & Time:</span>{' '}
-                {new Date(booking.dateTime).toLocaleString()}
-              </p>
-              <p>
-                <span className="text-blue-200 font-medium">Status:</span>{' '}
-                {booking.status || 'Pending'}
-              </p>
-            </motion.li>
+        <ul className="max-w-3xl mx-auto space-y-4">
+          {bookings.map((b) => (
+            <li key={b._id} className="p-6 bg-white rounded-lg shadow-md">
+              <p><strong>Service:</strong> {b.service}</p>
+              <p><strong>Date & Time:</strong> {new Date(b.dateTime).toLocaleString()}</p>
+              <p><strong>Status:</strong> {b.status || "Pending"}</p>
+            </li>
           ))}
-        </motion.ul>
+        </ul>
       )}
+     
     </div>
   );
 }
-
-

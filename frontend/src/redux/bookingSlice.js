@@ -1,87 +1,68 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import bookingApi from "../apiManager/booking"; // Your API functions
 
-const LOCAL_STORAGE_KEY = "mock_bookings";
-
-const saveBookingsToLocal = (bookings) => {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(bookings));
-};
-
-const getBookingsFromLocal = () => {
-  const bookings = localStorage.getItem(LOCAL_STORAGE_KEY);
-  return bookings ? JSON.parse(bookings) : [];
-};
-
-export const fetchBookingsByUser = createAsyncThunk(
-  "booking/fetchByUser",
-  async (userId) => {
-    const bookings = getBookingsFromLocal();
-    return bookings.filter((b) => b.userId === userId);
+// Fetch bookings for the logged-in user
+export const fetchUserBookings = createAsyncThunk(
+  "booking/fetchUser",
+  async () => {
+    const { data } = await bookingApi.getUserBookings();
+    return data.bookings; // Expecting { bookings: [...] }
   }
 );
 
-export const fetchBookingsByMentor = createAsyncThunk(
-  "booking/fetchByMentor",
-  async (mentorId) => {
-    const bookings = getBookingsFromLocal();
-    return bookings.filter((b) => b.mentorId === mentorId);
+// Fetch bookings for the logged-in mentor
+export const fetchMentorBookings = createAsyncThunk(
+  "booking/fetchMentor",
+  async () => {
+    const { data } = await bookingApi.getMentorBookings();
+    return data.bookings;
   }
 );
 
+// Create a new booking
 export const createBooking = createAsyncThunk(
   "booking/create",
-  async ({ userId, mentorId, serviceName, dateTime }) => {
-    const slug = `${userId}_${mentorId}_${Date.now()}`;
-    const newBooking = {
-      id: slug,
-      userId,
-      mentorId,
-      service: serviceName,
-      dateTime,
-      status: "pending",
-      slug,
-    };
-    const current = getBookingsFromLocal();
-    const updated = [...current, newBooking];
-    saveBookingsToLocal(updated);
-    return newBooking;
+  async (payload) => {
+    const { data } = await bookingApi.createBooking(payload);
+    return data.booking;
   }
 );
 
 const bookingSlice = createSlice({
   name: "booking",
   initialState: {
-    list: [],
-    status: "idle",
+    bookings: [], // All bookings
+    loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchBookingsByUser.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchBookingsByUser.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.list = action.payload;
-      })
-      .addCase(fetchBookingsByUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-      .addCase(fetchBookingsByMentor.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchBookingsByMentor.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.list = action.payload;
-      })
-      .addCase(fetchBookingsByMentor.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
-      .addCase(createBooking.fulfilled, (state, action) => {
-        state.list.push(action.payload);
-      });
+      .addMatcher(
+        (action) => action.type.startsWith("booking") && action.type.endsWith("/pending"),
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        }
+      )
+      .addMatcher(
+        (action) => action.type.startsWith("booking") && action.type.endsWith("/fulfilled"),
+        (state, action) => {
+          state.loading = false;
+          if (action.type.includes("create")) {
+            state.bookings.push(action.payload);
+          } else {
+            state.bookings = action.payload;
+          }
+        }
+      )
+      .addMatcher(
+        (action) => action.type.startsWith("booking") && action.type.endsWith("/rejected"),
+        (state, action) => {
+          state.loading = false;
+          state.error = action.error.message;
+        }
+      );
   },
 });
 

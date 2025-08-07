@@ -1,4 +1,4 @@
-const ServiceModel=require("../models/service.model");
+import ServiceModel from "../models/service.model.js";
 
 const createService=async(serviceData)=>{
     return await ServiceModel.create(serviceData)
@@ -25,9 +25,4 @@ const getServiceById=async(serviceId)=>{
 return await ServiceModel.findById(serviceId)
 };
 
-module.exports={
-    createService,
-    updateService,
-    getServiceByMentor,
-    getServiceById
-}
+export default { createService, updateService, getServiceByMentor, getServiceById };

@@ -8,6 +8,7 @@ import OpenAI from "openai";
 import authRouter from './routes/auth.route.js';
 import userRouter from './routes/user.route.js';
 import mentorRouter from './routes/mentor.route.js';
+import serviceRouter from './routes/service.route.js';
 import ApiError from './utils/ApiError.js';
 
 // Check for API key
@@ -40,6 +41,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/mentor', mentorRouter);
+app.use('/api/service',serviceRouter)
 
 // Root route
 app.get('/', (req, res) => {
