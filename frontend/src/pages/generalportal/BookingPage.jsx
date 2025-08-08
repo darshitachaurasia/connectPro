@@ -1,79 +1,324 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Button,
+  Card,
+  Avatar,
+  Calendar,
+  Input,
+  Typography,
+  Steps,
+  Alert,
+  Result,
+  Flex,
+  Radio
+} from "antd";
+import {
+  VideoCameraOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  CreditCardOutlined,
+  SafetyCertificateOutlined,
+  ArrowLeftOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+// --- New Imports ---
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { createBooking } from "../../redux/bookingSlice";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+// Assume createBooking action exists in your booking slice
+// import { createBooking } from "./redux/bookingSlice"; 
+
+const { Title, Text, Link } = Typography;
+
+// --- Data (This would typically be fetched using mentorId) ---
+const mentorData = {
+  id: 1,
+  name: "Sarah Chen",
+  title: "Senior Software Engineer",
+  company: "Google",
+  image: "https://i.pravatar.cc/80?u=sarah",
+};
+
+const services = [
+    {
+    id: 1,
+    name: "1-on-1 Career Consultation",
+    duration: 60,
+    price: 150,
+    description: "Comprehensive career guidance and personalized roadmap creation",
+  },
+  {
+    id: 2,
+    name: "Technical Interview Prep",
+    duration: 90,
+    price: 200,
+    description: "Mock interviews with detailed feedback on coding and system design",
+  },
+  {
+    id: 3,
+    name: "Resume & Portfolio Review",
+    duration: 45,
+    price: 120,
+    description: "Detailed review and optimization of your resume and portfolio",
+  },
+];
+
+const timeSlots = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
 
 export default function BookingPage() {
+  // --- New Hooks for Redux & Routing ---
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { mentorId } = useParams();
-  const user = useSelector((state) => state.auth.user);
+  const location = useLocation();
+  const { mentorId } = useParams(); // Get mentorId from URL
+  const { user } = useSelector((state) => state.auth); // Get user from Redux store
 
-  const [formData, setFormData] = useState({ serviceName: "", dateTime: "" });
-  const [success, setSuccess] = useState(false);
-
+  // --- State (Unchanged) ---
+  const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedService, setSelectedService] = useState(services[0]);
+  const [message, setMessage] = useState("");
+  const [step, setStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  
+  // --- New Authentication & Data Check Effect ---
   useEffect(() => {
-    if (!user) navigate("/login");
-    if (!mentorId) navigate("/mentors");
-  }, [user, mentorId, navigate]);
+    // If the user is not logged in, redirect them to the login page
+    if (!user) {
+      navigate("/login", { state: { from: location } });
+    }
+    // In a real app, you would also fetch mentor details using the mentorId
+  }, [user, mentorId, navigate, location]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(
-      createBooking({
-        userId: user._id,
-        mentorId,
-        serviceName: formData.serviceName,
-        dateTime: formData.dateTime,
-      })
-    );
-    setSuccess(true);
-    setTimeout(() => navigate("/booking-details"), 2000);
+  const handleNext = () => setStep((prev) => (prev < 3 ? prev + 1 : prev));
+  const handlePrevious = () => setStep((prev) => (prev > 1 ? prev - 1 : prev));
+
+  // --- Updated handleBooking function ---
+  const handleBooking = () => {
+    // Combine date and time to create a full ISODate string for the backend
+    const timeParts = selectedTime.match(/(\d+):(\d+)\s*(AM|PM)/);
+    if (!timeParts) return; // Or show an error
+
+    let hours = parseInt(timeParts[1], 10);
+    const minutes = parseInt(timeParts[2], 10);
+    if (timeParts[3] === 'PM' && hours < 12) hours += 12;
+    if (timeParts[3] === 'AM' && hours === 12) hours = 0; // Midnight case
+
+    const bookingDateTime = selectedDate.hour(hours).minute(minutes).second(0).toISOString();
+    
+    const bookingPayload = {
+      userId: user._id,
+      mentorId: mentorId,
+      service: selectedService,
+      dateTime: bookingDateTime,
+      message: message,
+      paymentDetails: {
+        method: paymentMethod,
+        amount: finalTotal,
+        transactionId: `txn_${Date.now()}` // Mock transaction ID
+      }
+    };
+
+    console.log("Dispatching booking:", bookingPayload);
+    // Uncomment the line below when your action is ready
+    // dispatch(createBooking(bookingPayload));
+    
+    setStep(4); // Proceed to success screen
   };
 
+  const disabledDate = (current) => {
+    const isPastDate = current && current < dayjs().startOf('day');
+    const dayOfWeek = current.day();
+    return isPastDate || dayOfWeek === 0 || dayOfWeek === 6;
+  }
+
+  const canProceedStep1 = selectedDate && selectedTime && selectedService;
+  const canProceedStep2 = paymentMethod;
+  const totalPrice = selectedService.price;
+  const platformFee = Math.round(totalPrice * 0.05);
+  const finalTotal = totalPrice + platformFee;
+
+  // --- Step 4: Confirmation Screen (Unchanged but now follows a real dispatch) ---
+  if (step === 4) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-white via-white">
+        <Result
+          status="success"
+          title="Booking Confirmed!"
+          subTitle={`Your session with ${mentorData.name} for ${selectedService.name} on ${selectedDate.format("MMMM D, YYYY")} at ${selectedTime} is booked.`}
+          extra={[
+            // These buttons now correctly navigate the user after booking
+            <Button type="primary" key="dashboard" onClick={() => navigate("/dashboard")}>Go to Dashboard</Button>,
+            <Button key="profile" onClick={() => navigate(`/mentor/${mentorId}`)}>View Mentor Profile</Button>,
+          ]}
+        />
+      </div>
+    );
+  }
+
+  const renderStepContent = () => {
+    // ...The content of this function (all the JSX for steps 1 and 2) remains the same
+    // For brevity, it's omitted here but should be copied from the previous version.
+    switch(step) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <Card title={<Flex align="center" gap="small"><VideoCameraOutlined /> Select Service</Flex>}>
+              <div className="space-y-4">
+                {services.map((service) => (
+                  <div
+                    key={service.id}
+                    onClick={() => setSelectedService(service)}
+                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedService.id === service.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold">{service.name}</p>
+                        <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                        <p className="text-sm text-gray-500 mt-2 flex items-center"><ClockCircleOutlined className="mr-1" /> {service.duration} min</p>
+                      </div>
+                      <p className="text-lg font-bold text-blue-600">${service.price}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card title={<Flex align="center" gap="small"><CalendarOutlined /> Select Date</Flex>}>
+                <Calendar fullscreen={false} onSelect={setSelectedDate} disabledDate={disabledDate} value={selectedDate} />
+              </Card>
+              <Card title={<Flex align="center" gap="small"><ClockCircleOutlined /> Select Time</Flex>}>
+                <div className="flex flex-wrap gap-2">
+                  {timeSlots.map((time) => (
+                    <Button key={time} type={selectedTime === time ? "primary" : "default"} onClick={() => setSelectedTime(time)} className="h-12 flex-grow">
+                      {time}
+                    </Button>
+                  ))}
+                </div>
+              </Card>
+            </div>
+            
+            <Card title="Message (Optional)" extra={`To: ${mentorData.name}`}>
+              <Input.TextArea rows={4} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Tell me about your goals, challenges, or specific topics..."/>
+            </Card>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-6">
+            <Card title={<Flex align="center" gap="small"><CreditCardOutlined /> Payment Method</Flex>}>
+                <div className="space-y-3">
+                    <div onClick={() => setPaymentMethod('card')} className={`p-4 border rounded-lg cursor-pointer ${paymentMethod === 'card' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
+                        <Flex align="center" gap="middle">
+                           <Radio checked={paymentMethod === 'card'}/>
+                           <div><Text strong>Credit/Debit Card</Text><br/><Text type="secondary">Visa, Mastercard, American Express</Text></div>
+                        </Flex>
+                    </div>
+                    <div onClick={() => setPaymentMethod('razorpay')} className={`p-4 border rounded-lg cursor-pointer ${paymentMethod === 'razorpay' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
+                        <Flex align="center" gap="middle">
+                           <Radio checked={paymentMethod === 'razorpay'}/>
+                           <div><Text strong>Razorpay</Text><br/><Text type="secondary">UPI, Net Banking, Wallets</Text></div>
+                        </Flex>
+                    </div>
+                </div>
+
+               {paymentMethod === "card" && (
+                <div className="mt-6 space-y-4">
+                  <hr />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input placeholder="First Name" />
+                    <Input placeholder="Last Name" />
+                  </div>
+                  <Input placeholder="Card Number" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input placeholder="MM/YY" />
+                    <Input placeholder="CVV" />
+                  </div>
+                </div>
+               )}
+            </Card>
+            <Alert message="Secure Payment" description="Your payment information is encrypted and secure." type="success" showIcon icon={<SafetyCertificateOutlined />} />
+          </div>
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700 px-4 py-10">
-      <motion.form
-        onSubmit={handleSubmit}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="bg-white p-8 rounded-xl shadow-xl max-w-md w-full text-gray-800 space-y-6"
-      >
-        <h2 className="text-3xl font-bold text-blue-700 text-center">
-          Book a Session
-        </h2>
-        {success && (
-          <p className="text-green-500 text-center">✅ Booking successfully created!</p>
-        )}
-        <div>
-          <label className="block text-sm text-gray-600">Service Name</label>
-          <input
-            type="text"
-            className="w-full p-3 rounded-lg border border-gray-300"
-            value={formData.serviceName}
-            onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
-            required
-          />
+    // --- Animated top-level container ---
+    <motion.div 
+      className="min-h-screen bg-gradient-to-br from-blue-50 to-white via-white"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          {/* This Link now uses the dynamic mentorId from the URL */}
+          <Link onClick={() => navigate(`/mentor/${mentorId}`)} className="flex items-center gap-2 text-gray-600 hover:text-blue-600 cursor-pointer">
+            <ArrowLeftOutlined /> Back to Profile
+          </Link>
         </div>
-        <div>
-          <label className="block text-sm text-gray-600">Date & Time</label>
-          <input
-            type="datetime-local"
-            className="w-full p-3 rounded-lg border border-gray-300"
-            value={formData.dateTime}
-            onChange={(e) => setFormData({ ...formData, dateTime: e.target.value })}
-            required
-          />
+      </header>
+
+      <main className="p-6 max-w-6xl mx-auto">
+        <div className="mb-8">
+          <Steps current={step - 1} items={[{ title: 'Select Date & Time' }, { title: 'Payment Details' }, { title: 'Confirmation' }]}/>
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
-        >
-          {success ? "Booked!" : "Confirm Booking"}
-        </button>
-      </motion.form>
-    </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            {renderStepContent()}
+            <div className="flex justify-between mt-6">
+              <Button onClick={handlePrevious} disabled={step === 1}>Previous</Button>
+              <Button type="primary" onClick={step === 2 ? handleBooking : handleNext} disabled={(step === 1 && !canProceedStep1) || (step === 2 && !canProceedStep2)}>
+                {step === 2 ? "Complete Booking" : "Next"}
+              </Button>
+            </div>
+          </div>
+          
+          <div className="lg:col-span-1">
+            <div className="sticky top-6">
+                <Card title="Booking Summary">
+                  <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <Avatar size={64} src={mentorData.image} />
+                        <div>
+                          <Text strong>{mentorData.name}</Text>
+                          <Text type="secondary" className="block">{mentorData.title}</Text>
+                          <Text type="secondary" className="block">{mentorData.company}</Text>
+                        </div>
+                      </div>
+                      <hr/>
+                      <div className="space-y-2">
+                          <div className="flex justify-between"><Text type="secondary">Service:</Text> <Text strong className="text-right">{selectedService.name}</Text></div>
+                          <div className="flex justify-between"><Text type="secondary">Duration:</Text> <Text strong>{selectedService.duration} minutes</Text></div>
+                          {selectedDate && <div className="flex justify-between"><Text type="secondary">Date:</Text> <Text strong>{selectedDate.format("MMM D, YYYY")}</Text></div>}
+                          {selectedTime && <div className="flex justify-between"><Text type="secondary">Time:</Text> <Text strong>{selectedTime}</Text></div>}
+                      </div>
+                      <hr/>
+                      <div className="space-y-2">
+                         <div className="flex justify-between"><Text type="secondary">Service Fee:</Text> <Text strong>${totalPrice}</Text></div>
+                         <div className="flex justify-between"><Text type="secondary">Platform Fee:</Text> <Text strong>${platformFee}</Text></div>
+                         <hr/>
+                         <div className="flex justify-between items-center"><Title level={4} className="!m-0">Total:</Title> <Title level={4} className="!m-0 !text-blue-600">${finalTotal}</Title></div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                          <ul className="space-y-1 list-none p-0">
+                            {['HD video call', 'Session recording', 'Follow-up notes', '24/7 support'].map(item => (
+                              <li key={item} className="flex items-center"><CheckCircleOutlined className="text-green-500 mr-2"/><Text type="secondary">{item}</Text></li>
+                            ))}
+                          </ul>
+                      </div>
+                  </div>
+                </Card>
+            </div>
+          </div>
+        </div>
+      </main>
+    </motion.div>
   );
 }

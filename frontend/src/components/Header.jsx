@@ -10,7 +10,6 @@ function Header() {
 
   const navItems = [
     { name: 'Home', slug: '/', active: true },
-    { name: 'Login', slug: '/login', active: !authUser },
     { name: 'SignUp', slug: '/signup', active: !authUser },
       {name : 'Career Quiz',slug :'/quiz', active :true},
         {name : ' AI Career Counsellor ',slug :'/ai', active :true},
