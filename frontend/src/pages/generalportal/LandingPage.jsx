@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom'; // Assuming react-router-dom is set up
-import HeroSection from './HeroSection';
+
 import Flow from './Flow';
 
 // Placeholder for mentor.png as local files cannot be accessed
