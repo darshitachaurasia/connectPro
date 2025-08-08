@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom'; // Assuming react-router-dom is set up
-
 import Flow from './Flow';
+import CareerQuizPage from './CarrerQuiz';
+import CareerPathAI from './AI-Suggestions';
 
 // Placeholder for mentor.png as local files cannot be accessed
 const mentorPlaceholderImage = "https://placehold.co/600x400/a7d9f7/000?text=Mentor";
@@ -433,6 +434,8 @@ const LandingPage = () => {
        
        <Flow/>
 
+       <CareerQuizPage/>
+
       {/* ServicesPage Component */}
       <div>
         <ServicesPage />
@@ -460,7 +463,7 @@ const LandingPage = () => {
       </section>
 
 
-  
+  <CareerPathAI/>
 
       {/* Pricing Section */}
       <section className="px-10 py-24 text-center bg-blue-50">
