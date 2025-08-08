@@ -1,21 +1,10 @@
-'use client'
-
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Layout, Card, Input, Button, Avatar, Typography, Space, Tag, Row, Col, Spin } from 'antd'
 import { ArrowLeftOutlined, RobotOutlined, UserOutlined, SendOutlined, BulbOutlined, RiseOutlined, TeamOutlined } from '@ant-design/icons'
-import Link from 'next/link'
 
 // AntD Components
 const { Header, Content } = Layout
 const { Title, Paragraph, Text } = Typography
-
-interface Message {
-  id: string
-  content: string
-  sender: 'user' | 'ai'
-  timestamp: Date
-  suggestions?: string[]
-}
 
 const quickPrompts = [
   'Tell me about software engineering career path',
@@ -27,7 +16,7 @@ const quickPrompts = [
 ]
 
 export default function CareerChat() {
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState([
     {
       id: '1',
       content:
@@ -39,7 +28,7 @@ export default function CareerChat() {
   ])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesEndRef = useRef(null)
 
   // Auto scroll
   useEffect(() => {
@@ -47,10 +36,10 @@ export default function CareerChat() {
   }, [messages])
 
   // Handle Send
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content) => {
     if (!content.trim()) return
 
-    const userMessage: Message = {
+    const userMessage = {
       id: Date.now().toString(),
       content: content.trim(),
       sender: 'user',
@@ -61,10 +50,9 @@ export default function CareerChat() {
     setInputValue('')
     setIsTyping(true)
 
-    // Fetch AI response using LangChain API
     const aiResponse = await fetchLangChainResponse(content)
 
-    const aiMessage: Message = {
+    const aiMessage = {
       id: (Date.now() + 1).toString(),
       content: aiResponse.content,
       sender: 'ai',
@@ -76,8 +64,8 @@ export default function CareerChat() {
     setIsTyping(false)
   }
 
-  // LangChain API Integration
-  const fetchLangChainResponse = async (query: string) => {
+  // API Integration
+  const fetchLangChainResponse = async (query) => {
     try {
       const response = await fetch('/api/langchain-chat', {
         method: 'POST',
@@ -89,36 +77,53 @@ export default function CareerChat() {
     } catch (error) {
       console.error('LangChain Error:', error)
       return {
-        content:
-          'Oops! Something went wrong. Please try again later.',
+        content: 'Oops! Something went wrong. Please try again later.',
         suggestions: ['Retry', 'Check another topic'],
       }
     }
   }
 
-  const handleQuickPrompt = (prompt: string) => {
+  const handleQuickPrompt = (prompt) => {
     handleSendMessage(prompt)
   }
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#f7f9fc' }}>
       {/* Header */}
-      <Header style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Header
+        style={{
+          background: '#fff',
+          borderBottom: '1px solid #f0f0f0',
+          padding: '0 24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Space>
-          <Link href="/career-suggestions">
-            <Button type="link" icon={<ArrowLeftOutlined />} style={{ fontSize: 16 }}>
-              Back
-            </Button>
-          </Link>
+          <Button
+            type="link"
+            icon={<ArrowLeftOutlined />}
+            style={{ fontSize: 16 }}
+            onClick={() => window.history.back()}
+          >
+            Back
+          </Button>
           <Space>
             <Avatar icon={<RobotOutlined />} style={{ backgroundColor: '#1890ff' }} />
             <div>
-              <Title level={5} style={{ margin: 0 }}>AI Career Advisor</Title>
-              <Text type="secondary" style={{ fontSize: 12 }}>Online • Ready to help</Text>
+              <Title level={5} style={{ margin: 0 }}>
+                AI Career Advisor
+              </Title>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Online • Ready to help
+              </Text>
             </div>
           </Space>
         </Space>
-        <Button type="primary" href="/mentors">Find Human Mentors</Button>
+        <Button type="primary" onClick={() => alert('Redirect to mentors page')}>
+          Find Human Mentors
+        </Button>
       </Header>
 
       <Content style={{ maxWidth: 1000, margin: '0 auto', padding: '24px' }}>
@@ -143,7 +148,13 @@ export default function CareerChat() {
         <Card style={{ height: '60vh', overflowY: 'auto', marginBottom: 16, borderRadius: 8 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {messages.map((message) => (
-              <div key={message.id} style={{ display: 'flex', justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start' }}>
+              <div
+                key={message.id}
+                style={{
+                  display: 'flex',
+                  justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start',
+                }}
+              >
                 <Space align="start">
                   {message.sender === 'ai' && <Avatar icon={<RobotOutlined />} />}
                   <div
@@ -155,7 +166,9 @@ export default function CareerChat() {
                       maxWidth: '70%',
                     }}
                   >
-                    <Paragraph style={{ marginBottom: 8, whiteSpace: 'pre-line' }}>{message.content}</Paragraph>
+                    <Paragraph style={{ marginBottom: 8, whiteSpace: 'pre-line' }}>
+                      {message.content}
+                    </Paragraph>
                     {message.suggestions && (
                       <Space wrap>
                         {message.suggestions.map((s, i) => (
@@ -169,7 +182,9 @@ export default function CareerChat() {
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
-                  {message.sender === 'user' && <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />}
+                  {message.sender === 'user' && (
+                    <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
+                  )}
                 </Space>
               </div>
             ))}
@@ -178,7 +193,10 @@ export default function CareerChat() {
                 <Space align="start">
                   <Avatar icon={<RobotOutlined />} />
                   <div style={{ background: '#f0f0f0', padding: '12px 16px', borderRadius: 8 }}>
-                    <Spin size="small" /> <Text type="secondary" style={{ marginLeft: 8 }}>AI is thinking...</Text>
+                    <Spin size="small" />{' '}
+                    <Text type="secondary" style={{ marginLeft: 8 }}>
+                      AI is thinking...
+                    </Text>
                   </div>
                 </Space>
               </div>
@@ -209,21 +227,27 @@ export default function CareerChat() {
             <Card bordered={false} style={{ textAlign: 'center', background: '#fafafa' }}>
               <BulbOutlined style={{ fontSize: 32, color: '#1890ff' }} />
               <Title level={5}>Career Guidance</Title>
-              <Text type="secondary">Get personalized advice on career paths and transitions</Text>
+              <Text type="secondary">
+                Get personalized advice on career paths and transitions
+              </Text>
             </Card>
           </Col>
           <Col xs={24} md={8}>
             <Card bordered={false} style={{ textAlign: 'center', background: '#fafafa' }}>
               <RiseOutlined style={{ fontSize: 32, color: '#1890ff' }} />
               <Title level={5}>Market Insights</Title>
-              <Text type="secondary">Stay updated with latest industry trends and demands</Text>
+              <Text type="secondary">
+                Stay updated with latest industry trends and demands
+              </Text>
             </Card>
           </Col>
           <Col xs={24} md={8}>
             <Card bordered={false} style={{ textAlign: 'center', background: '#fafafa' }}>
               <TeamOutlined style={{ fontSize: 32, color: '#1890ff' }} />
               <Title level={5}>Skill Development</Title>
-              <Text type="secondary">Learn what skills you need for your target role</Text>
+              <Text type="secondary">
+                Learn what skills you need for your target role
+              </Text>
             </Card>
           </Col>
         </Row>

@@ -14,6 +14,9 @@ function Header() {
     { name: 'SignUp', slug: '/signup', active: !authUser },
     { name: 'Services', slug: '/service', active: true },
     {name : 'Resources',slug :'/Learn', active :true},
+      {name : 'Mentor',slug :'/mentor-page', active :true},
+      {name : 'Career Quiz',slug :'/quiz', active :true},
+        {name : 'AI ',slug :'/ai', active :true},
   ];
 
   return (

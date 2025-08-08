@@ -34,6 +34,9 @@ import LearnHeader from "./pages/generalportal/Learn.jsx";
 
 import MentorServices from "./pages/mentorPortal/MentorServices.jsx";
 import MentorBookings from "./pages/mentorPortal/MentorBookings.jsx";
+import MentorsPage from "./pages/generalportal/MentorsList.jsx";
+import CareerTestBanner from "./pages/generalportal/CarrerQuiz.jsx";
+import CareerChat from "./pages/generalportal/AIChat.jsx";
 
 
 
@@ -78,9 +81,22 @@ const router = createBrowserRouter([
                 path: "/booking-page/:mentorId",
                 element: <BookingPage />,
             },
+            
             {
                 path: "/mentor-details",
                 element: <MentorDetails />,
+            },
+             {
+                path: "/mentor-page",
+                element: <MentorsPage/>,
+            },
+             {
+                path: "/quiz",
+                element: <CareerTestBanner/>,
+            },
+             {
+                path: "/ai",
+                element: <CareerChat/>,
             },
 
             // Mentor Portal
