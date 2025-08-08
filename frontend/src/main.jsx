@@ -35,8 +35,10 @@ import LearnHeader from "./pages/generalportal/Learn.jsx";
 import MentorServices from "./pages/mentorPortal/MentorServices.jsx";
 import MentorBookings from "./pages/mentorPortal/MentorBookings.jsx";
 import MentorsPage from "./pages/generalportal/MentorsList.jsx";
-import CareerTestBanner from "./pages/generalportal/CarrerQuiz.jsx";
+import CareerTestBanner from "./pages/generalportal/CareerTestBanner.jsx";
 import CareerChat from "./pages/generalportal/AIChat.jsx";
+import CareerCounsellingQuiz from "./pages/generalportal/CareerQuiz.jsx";
+import CareerPathAI from "./pages/generalportal/AI-Suggestions.jsx";
 
 
 
@@ -92,13 +94,16 @@ const router = createBrowserRouter([
             },
              {
                 path: "/quiz",
-                element: <CareerTestBanner/>,
+                element: <CareerCounsellingQuiz/>,
             },
              {
                 path: "/ai",
                 element: <CareerChat/>,
             },
-
+              {
+                path: "/path",
+                element: <CareerPathAI/>,
+            },
             // Mentor Portal
             {
                 path: "/mentor-login",

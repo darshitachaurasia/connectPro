@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom'; // Assuming react-router-dom is set up
 import Flow from './Flow';
-import CareerQuizPage from './CarrerQuiz';
+import CareerQuizPage from './CareerTestBanner';
 import CareerPathAI from './AI-Suggestions';
 
 // Placeholder for mentor.png as local files cannot be accessed

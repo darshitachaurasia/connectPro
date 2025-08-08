@@ -12,11 +12,12 @@ function Header() {
     { name: 'Home', slug: '/', active: true },
     { name: 'Login', slug: '/login', active: !authUser },
     { name: 'SignUp', slug: '/signup', active: !authUser },
-    { name: 'Services', slug: '/service', active: true },
-    {name : 'Resources',slug :'/Learn', active :true},
-      {name : 'Mentor',slug :'/mentor-page', active :true},
       {name : 'Career Quiz',slug :'/quiz', active :true},
-        {name : 'AI ',slug :'/ai', active :true},
+        {name : ' AI Career Counsellor ',slug :'/ai', active :true},
+        {name : ' AI Skill Assessment ',slug :'/path', active :true},
+         {name : 'Find Mentor',slug :'/mentor-page', active :true},
+        { name: 'Services', slug: '/service', active: true },
+         {name : 'Resources',slug :'/Learn', active :true},
   ];
 
   return (
