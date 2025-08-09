@@ -39,6 +39,7 @@ import CareerTestBanner from "./pages/generalportal/CareerTestBanner.jsx";
 import CareerChat from "./pages/generalportal/AIChat.jsx";
 import CareerCounsellingQuiz from "./pages/generalportal/CareerQuiz.jsx";
 import CareerPathAI from "./pages/generalportal/AI-Suggestions.jsx";
+import Counsellor from "./pages/generalportal/Counsellor.jsx";
 
 
 
@@ -98,7 +99,7 @@ const router = createBrowserRouter([
             },
              {
                 path: "/ai",
-                element: <CareerChat/>,
+                element: <Counsellor/>,
             },
               {
                 path: "/path",

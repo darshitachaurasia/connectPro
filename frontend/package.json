@@ -10,21 +10,20 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@langchain/google-genai": "^0.2.16",
         "@reduxjs/toolkit": "^2.8.2",
         "@tailwindcss/vite": "^4.1.11",
         "antd": "^5.26.6",
         "axios": "^1.10.0",
         "framer-motion": "^12.19.1",
-
         "lucide-react": "^0.526.0",
-
         "moment": "^2.30.1",
-
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "react-hook-form": "^7.57.0",
         "react-hot-toast": "^2.5.2",
         "react-icons": "^5.5.0",
+        "react-markdown": "^10.1.0",
         "react-redux": "^9.2.0",
         "react-router-dom": "^7.6.2",
         "react-toastify": "^11.0.5",

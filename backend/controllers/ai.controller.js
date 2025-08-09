@@ -2,13 +2,10 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Career suggestions based on skills
 export const skill = asyncHandler(async (req, res) => {
   let { skills } = req.body;
-
   console.log("📩 Received skills:", skills);
 
   if (Array.isArray(skills)) {
@@ -30,7 +27,9 @@ Format clearly in numbered points.
     `;
 
     const result = await model.generateContent(prompt);
-    const reply = result?.response?.text()?.trim();
+
+    // ✅ Correct way to extract Gemini text
+    const reply = result.response.text().trim();
 
     if (!reply) {
       throw new Error("No suggestions received from Gemini");
@@ -47,45 +46,5 @@ Here are 3 general career options based on your skills:
 3. Technical Writer – Perfect for those with both tech and communication skills.`;
 
     res.status(200).json({ suggestions: fallback });
-  }
-});
-
-// AI Career Counsellor
-export const counsellor = asyncHandler(async (req, res) => {
-  const { query } = req.body;
-
-  if (!query || query.trim() === '') {
-    return res.status(400).json({ error: 'Query is required' });
-  }
-
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
-    const prompt = `
-You are an AI career advisor. Answer concisely and helpfully.
-User: ${query}
-    `;
-
-    const result = await model.generateContent(prompt);
-    const reply = result?.response?.text()?.trim();
-
-    if (!reply) {
-      throw new Error("No response received from Gemini");
-    }
-
-    res.json({
-      content: reply,
-      suggestions: [
-        "Explore career options",
-        "Salary information",
-        "Skill requirements"
-      ]
-    });
-  } catch (error) {
-    console.error("🔥 Career Counsellor Error:", error.message);
-    res.status(500).json({
-      content: "Something went wrong while fetching AI response.",
-      suggestions: ["Retry", "Change question"]
-    });
   }
 });

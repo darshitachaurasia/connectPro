@@ -58,7 +58,25 @@ export default function CareerChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
+ const fetchLangChainResponse = async (query) => {
+    try {
+      const response = await fetch("/api/langchain-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+      
+      const text = await response.text(); // read raw text first
+    if (!text) throw new Error("Empty response from server");
+     return JSON.parse(text);
+    } catch (error) {
+      console.error("LangChain Error:", error);
+      return {
+        content: "Oops! Something went wrong. Please try again later.",
+        suggestions: ["Retry", "Check another topic"]
+      };
+    }
+  };
   const handleSendMessage = async (content) => {
     if (!content.trim()) return;
 
@@ -87,25 +105,7 @@ export default function CareerChat() {
     setIsTyping(false);
   };
 
-  const fetchLangChainResponse = async (query) => {
-    try {
-      const response = await fetch("/api/langchain-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query })
-      });
-      
-      const text = await response.text(); // read raw text first
-    if (!text) throw new Error("Empty response from server");
-     return JSON.parse(text);
-    } catch (error) {
-      console.error("LangChain Error:", error);
-      return {
-        content: "Oops! Something went wrong. Please try again later.",
-        suggestions: ["Retry", "Check another topic"]
-      };
-    }
-  };
+ 
 
   const handleQuickPrompt = (prompt) => {
     handleSendMessage(prompt);
