@@ -26,43 +26,11 @@ import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import mentorApi from "../../apiManager/mentor";
 // Assume createBooking action exists in your booking slice
 // import { createBooking } from "./redux/bookingSlice"; 
 
 const { Title, Text, Link } = Typography;
-
-// --- Data (This would typically be fetched using mentorId) ---
-const mentorData = {
-  id: 1,
-  name: "Sarah Chen",
-  title: "Senior Software Engineer",
-  company: "Google",
-  image: "https://i.pravatar.cc/80?u=sarah",
-};
-
-const services = [
-    {
-    id: 1,
-    name: "1-on-1 Career Consultation",
-    duration: 60,
-    price: 150,
-    description: "Comprehensive career guidance and personalized roadmap creation",
-  },
-  {
-    id: 2,
-    name: "Technical Interview Prep",
-    duration: 90,
-    price: 200,
-    description: "Mock interviews with detailed feedback on coding and system design",
-  },
-  {
-    id: 3,
-    name: "Resume & Portfolio Review",
-    duration: 45,
-    price: 120,
-    description: "Detailed review and optimization of your resume and portfolio",
-  },
-];
 
 const timeSlots = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
 
@@ -73,22 +41,38 @@ export default function BookingPage() {
   const location = useLocation();
   const { mentorId } = useParams(); // Get mentorId from URL
   const { user } = useSelector((state) => state.auth); // Get user from Redux store
+  const [mentor, setMentor] = useState(null);
+  const [services, setServices] = useState([]);
 
   // --- State (Unchanged) ---
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedTime, setSelectedTime] = useState("");
-  const [selectedService, setSelectedService] = useState(services[0]);
+  const [selectedService, setSelectedService] = useState(null);
   const [message, setMessage] = useState("");
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("");
   
   // --- New Authentication & Data Check Effect ---
   useEffect(() => {
-    // If the user is not logged in, redirect them to the login page
     if (!user) {
       navigate("/login", { state: { from: location } });
     }
-    // In a real app, you would also fetch mentor details using the mentorId
+    const fetchMentor = async () => {
+      try {
+        const response = await mentorApi.getMentorById(mentorId);
+        setMentor(response.data.mentor);
+        const activeServices =
+          response.data.mentor.services?.filter((service) => service.active) ||
+          [];
+        setServices(activeServices);
+        if (activeServices.length > 0) {
+          setSelectedService(activeServices[0]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch mentor details", error);
+      }
+    };
+    fetchMentor();
   }, [user, mentorId, navigate, location]);
 
   const handleNext = () => setStep((prev) => (prev < 3 ? prev + 1 : prev));
@@ -135,18 +119,26 @@ export default function BookingPage() {
 
   const canProceedStep1 = selectedDate && selectedTime && selectedService;
   const canProceedStep2 = paymentMethod;
-  const totalPrice = selectedService.price;
+  const totalPrice = selectedService ? selectedService.price : 0;
   const platformFee = Math.round(totalPrice * 0.05);
   const finalTotal = totalPrice + platformFee;
 
   // --- Step 4: Confirmation Screen (Unchanged but now follows a real dispatch) ---
+  if (!mentor) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 text-blue-700 text-3xl">
+        Loading booking page...
+      </div>
+    );
+  }
+
   if (step === 4) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-white via-white">
         <Result
           status="success"
           title="Booking Confirmed!"
-          subTitle={`Your session with ${mentorData.name} for ${selectedService.name} on ${selectedDate.format("MMMM D, YYYY")} at ${selectedTime} is booked.`}
+          subTitle={`Your session with ${mentor.fullname} for ${selectedService.name} on ${selectedDate.format("MMMM D, YYYY")} at ${selectedTime} is booked.`}
           extra={[
             // These buttons now correctly navigate the user after booking
             <Button type="primary" key="dashboard" onClick={() => navigate("/dashboard")}>Go to Dashboard</Button>,
@@ -168,9 +160,9 @@ export default function BookingPage() {
               <div className="space-y-4">
                 {services.map((service) => (
                   <div
-                    key={service.id}
+                    key={service._id}
                     onClick={() => setSelectedService(service)}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedService.id === service.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedService?._id === service._id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -200,7 +192,7 @@ export default function BookingPage() {
               </Card>
             </div>
             
-            <Card title="Message (Optional)" extra={`To: ${mentorData.name}`}>
+            <Card title="Message (Optional)" extra={`To: ${mentor.fullname}`}>
               <Input.TextArea rows={4} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Tell me about your goals, challenges, or specific topics..."/>
             </Card>
           </div>
@@ -285,17 +277,16 @@ export default function BookingPage() {
                 <Card title="Booking Summary">
                   <div className="space-y-4">
                       <div className="flex items-center gap-4">
-                        <Avatar size={64} src={mentorData.image} />
+                        <Avatar size={64} src={mentor.avatar} />
                         <div>
-                          <Text strong>{mentorData.name}</Text>
-                          <Text type="secondary" className="block">{mentorData.title}</Text>
-                          <Text type="secondary" className="block">{mentorData.company}</Text>
+                          <Text strong>{mentor.fullname}</Text>
+                          <Text type="secondary" className="block">{mentor.bio}</Text>
                         </div>
                       </div>
                       <hr/>
                       <div className="space-y-2">
-                          <div className="flex justify-between"><Text type="secondary">Service:</Text> <Text strong className="text-right">{selectedService.name}</Text></div>
-                          <div className="flex justify-between"><Text type="secondary">Duration:</Text> <Text strong>{selectedService.duration} minutes</Text></div>
+                          {selectedService && <div className="flex justify-between"><Text type="secondary">Service:</Text> <Text strong className="text-right">{selectedService.name}</Text></div>}
+                          {selectedService && <div className="flex justify-between"><Text type="secondary">Duration:</Text> <Text strong>{selectedService.duration} minutes</Text></div>}
                           {selectedDate && <div className="flex justify-between"><Text type="secondary">Date:</Text> <Text strong>{selectedDate.format("MMM D, YYYY")}</Text></div>}
                           {selectedTime && <div className="flex justify-between"><Text type="secondary">Time:</Text> <Text strong>{selectedTime}</Text></div>}
                       </div>

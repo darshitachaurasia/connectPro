@@ -50,8 +50,7 @@ function MentorDetails() {
             <span className="font-semibold text-blue-600">Experience:</span> {mentor.experience}
           </p>
           <p>
-            <span className="font-semibold text-blue-600">Services:</span>{" "}
-            {mentor.services?.join(", ") || "N/A"}
+            <span className="font-semibold text-blue-600">Number of Services:</span> {mentor.services?.filter(service => service.active).length || 0}
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { FaPhone, FaEdit } from "react-icons/fa"; // Example icons
 
-const ServiceCard = ({ service, onEdit }) => {
+const ServiceCard = ({ service, onEdit, onToggleActive }) => {
   return (
     <div className="p-4 mb-4 bg-white border rounded-lg shadow-lg">
       {/* Service Icon */}
@@ -14,7 +14,7 @@ const ServiceCard = ({ service, onEdit }) => {
         </div>
         {/* Enable/Disable Button */}
         <button
-          // onClick={}
+          onClick={onToggleActive}
           className={`${
             service?.active ? "bg-green-500" : "bg-red-500"
           } text-white px-3 py-1 rounded-md`}
@@ -36,7 +36,8 @@ const ServiceCard = ({ service, onEdit }) => {
       <div className="flex items-center justify-end gap-4">
         <button
           onClick={onEdit}
-          className="flex items-center gap-1 text-blue-500 hover:text-blue-700"
+          disabled={!service?.active}
+          className="flex items-center gap-1 text-blue-500 hover:text-blue-700 disabled:opacity-50"
         >
           <FaEdit size={16} />
           Edit
