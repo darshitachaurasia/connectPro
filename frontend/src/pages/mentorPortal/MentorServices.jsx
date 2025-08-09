@@ -4,23 +4,24 @@ import toast from "react-hot-toast";
 import { FiPlus } from "react-icons/fi";
 import ServiceCard from "../../components/ServiceCard";
 import service from "../../apiManager/service";
+import { useSelector } from "react-redux";
 
 const MentorServices = () => {
   const [services, setServices] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchServices = async () => {
       setLoading(true);
       try {
-        const mentorId = "your-mentor-id"; // Replace dynamically later
-        if (!mentorId) {
+        if (!user?._id) {
           toast.error("Mentor ID is missing. Please login again.");
           return;
         }
-        const response = await service.getServicesByMentor(mentorId);
+        const response = await service.getServicesByMentor(user._id);
         setServices(response?.data?.services || []);
       } catch (error) {
         toast.error("Failed to load services. Please try again later.");
@@ -28,8 +29,10 @@ const MentorServices = () => {
         setLoading(false);
       }
     };
-    fetchServices();
-  }, []);
+    if (user?._id) {
+      fetchServices();
+    }
+  }, [user]);
 
   const handleCreateService = async (values) => {
     setLoading(true);
@@ -96,8 +99,8 @@ const MentorServices = () => {
           initialValues={editingService}
         >
           <Form.Item
-            label="Name"
-            name="name"
+            label="Service Name"
+            name="serviceName"
             rules={[{ required: true, message: "Please enter the service name!" }]}
           >
             <Input />

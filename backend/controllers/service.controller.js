@@ -5,11 +5,11 @@ import serviceService from "../services/service.service.js";
 const createService = async (req, res, next) => {
   try {
     const mentorId = req.user._id;
-    const { name, description, duration, price } = req.body;
+    const { serviceName, description, duration, price } = req.body;
 
     const service = await serviceService.createService({
       mentor: mentorId,
-      name,
+      serviceName,
       description,
       duration,
       price,
@@ -29,12 +29,12 @@ const updateService = async (req, res, next) => {
   try {
     const { serviceId } = req.params;
     const mentorId = req.user._id;
-    const { name, description, duration, price, active } = req.body;
+    const { serviceName, description, duration, price, active } = req.body;
 
     const updatedService = await serviceService.updateService(
       serviceId,
       mentorId,
-      { name, description, duration, price, active }
+      { serviceName, description, duration, price, active }
     );
 
     if (!updatedService) {
@@ -53,7 +53,7 @@ const updateService = async (req, res, next) => {
 
 const getServiceByMentor = async (req, res, next) => {
   try {
-    const mentorId = req.user._id;
+    const { mentorId } = req.params;
     const services = await serviceService.getServiceByMentor(mentorId);
 
     res.status(httpStatus.ok).json({

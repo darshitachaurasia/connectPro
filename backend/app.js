@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: './.env' });
 
 import express from 'express';
 import cookieParser from 'cookie-parser';
@@ -9,6 +9,7 @@ import authRouter from './routes/auth.route.js';
 import userRouter from './routes/user.route.js';
 import mentorRouter from './routes/mentor.route.js';
 import serviceRouter from './routes/service.route.js';
+import bookingRouter from './routes/booking.routes.js';
 import ApiError from './utils/ApiError.js';
 
 import aiRouter from './routes/ai.route.js';
@@ -32,7 +33,7 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: 'http://localhost:5173', // Replace with your frontend domain
-  methods: ['GET', 'POST', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
@@ -44,6 +45,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/mentor', mentorRouter);
 app.use('/api/service', serviceRouter);
+app.use('/api/bookings', bookingRouter);
 app.use('/api', aiRouter);
 
 // Root route

@@ -8,8 +8,15 @@ const getUserBookings = async () => {
   return await AxiosInstances.get("/bookings/user"); // GET
 };
 
+import { getToken } from "../helper";
+
 const getMentorBookings = async () => {
-  return await AxiosInstances.get("/bookings/mentor"); // GET
+  const token = getToken();
+  return await AxiosInstances.get("/bookings/mentor", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }); // GET
 };
 
 export default { createBooking, getUserBookings, getMentorBookings };

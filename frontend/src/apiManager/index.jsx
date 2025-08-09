@@ -27,7 +27,7 @@ AxiosInstance.interceptors.response.use(
                 if (status === 401) {
                     removeToken();
                     sessionStorage.removeItem(USER_STORE_PERSIST);
-                    window.location.href = "/signin";
+                    window.location.href = "/login";
                 }
             } else {
                 toast.error("Something went wrong");

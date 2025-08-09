@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 export default function BookingDetails() {
   const dispatch = useDispatch();
-  const bookings = useSelector((state) => state.booking.list);
+  const bookings = useSelector((state) => state.booking.bookings);
 
   useEffect(() => {
     dispatch(fetchUserBookings());

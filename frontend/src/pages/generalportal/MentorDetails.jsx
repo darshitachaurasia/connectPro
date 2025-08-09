@@ -1,12 +1,23 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import mentorApi from '../../apiManager/mentor';
 
 function MentorDetails() {
   const { id } = useParams();
-  const mentors = useSelector(state => state.mentor.list);
-  const mentor = mentors.find((m) => m.$id === id);
+  const [mentor, setMentor] = useState(null);
+
+  useEffect(() => {
+    const fetchMentor = async () => {
+      try {
+        const response = await mentorApi.getMentorById(id);
+        setMentor(response.data.mentor);
+      } catch (error) {
+        console.error("Failed to fetch mentor details", error);
+      }
+    };
+    fetchMentor();
+  }, [id]);
 
   if (!mentor) {
     return (
@@ -15,6 +26,8 @@ function MentorDetails() {
       </div>
     );
   }
+
+  console.log(mentor, "mentor");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 text-blue-900 px-6 py-12">
@@ -28,7 +41,7 @@ function MentorDetails() {
 
         <div className="space-y-4 text-lg">
           <p>
-            <span className="font-semibold text-blue-600">Name:</span> {mentor.name}
+            <span className="font-semibold text-blue-600">Name:</span> {mentor.fullname}
           </p>
           <p>
             <span className="font-semibold text-blue-600">Bio:</span> {mentor.bio}
@@ -44,7 +57,7 @@ function MentorDetails() {
 
         <div className="mt-10 text-center">
           <Link
-            to={`/booking-page/${mentor.$id}`}
+            to={`/booking-page/${mentor._id}`}
             className="inline-block bg-blue-600 hover:bg-blue-700 transition px-6 py-3 text-lg font-semibold rounded-full text-white shadow-md"
           >
             Book This Mentor

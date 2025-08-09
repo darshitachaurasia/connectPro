@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Card,
   Input,
@@ -29,52 +30,40 @@ const { Meta } = Card;
 const { Option } = Select;
 const { Title, Text, Paragraph } = Typography;
 
-const mentors = [
-  {
-    id: 1,
-    name: "Sarah Chen",
-    title: "Senior Software Engineer",
-    company: "Google",
-    expertise: ["Software Engineering", "Machine Learning", "Career Transition"],
-    rating: 4.9,
-    reviewCount: 127,
-    hourlyRate: 150,
-    location: "San Francisco, CA",
-    experience: "8+ years",
-    languages: ["English", "Mandarin"],
-    availability: "Available this week",
-    image: "/placeholder.svg?height=100&width=100",
-    bio: "Passionate about helping developers transition into big tech companies. Specialized in system design and ML engineering.",
-    sessions: 450,
-    responseTime: "< 2 hours"
-  },
-  {
-    id: 2,
-    name: "Michael Rodriguez",
-    title: "Product Manager",
-    company: "Microsoft",
-    expertise: ["Product Management", "Strategy", "Leadership"],
-    rating: 4.8,
-    reviewCount: 89,
-    hourlyRate: 120,
-    location: "Seattle, WA",
-    experience: "6+ years",
-    languages: ["English", "Spanish"],
-    availability: "Available next week",
-    image: "/placeholder.svg?height=100&width=100",
-    bio: "Former startup founder turned PM at Microsoft. Expert in product strategy and go-to-market planning.",
-    sessions: 320,
-    responseTime: "< 4 hours"
-  }
-  // ... other mentors
-];
+import { useEffect } from "react";
+import mentorApi from "../../apiManager/mentor";
+import useMentorStore from "../../redux/mentors";
 
 export default function MentorsPage() {
+  const mentors = useMentorStore((state) => state.mentorsData);
+  const setMentorsData = useMentorStore((state) => state.setMentorsData);
+  const [allMentors, setAllMentors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedExpertise, setSelectedExpertise] = useState("All Expertise");
   const [priceRange, setPriceRange] = useState([50, 200]);
   const [selectedRating, setSelectedRating] = useState("Any Rating");
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const fetchMentors = async () => {
+      const filters = {
+        fullname: searchTerm,
+        expertise: selectedExpertise === "All Expertise" ? "" : selectedExpertise,
+        rating: selectedRating === "Any Rating" ? "" : selectedRating,
+      };
+
+      if (priceRange[0] !== 50 || priceRange[1] !== 200) {
+        filters.priceRange = priceRange.join("-");
+      }
+      
+      const response = await mentorApi.getAllMentors(filters);
+      if (searchTerm === "" && selectedExpertise === "All Expertise" && selectedRating === "Any Rating" && (priceRange[0] === 50 && priceRange[1] === 200)) {
+        setAllMentors(response.data.mentors);
+      }
+      setMentorsData(response.data.mentors);
+    };
+    fetchMentors();
+  }, [searchTerm, selectedExpertise, selectedRating, priceRange]);
 
   const expertiseOptions = [
     "Software Engineering",
@@ -89,27 +78,9 @@ export default function MentorsPage() {
     "Leadership"
   ];
 
-  const filteredMentors = mentors.filter((mentor) => {
-    const matchesSearch =
-      mentor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mentor.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mentor.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mentor.expertise.some((exp) =>
-        exp.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+  const filteredMentors = mentors;
 
-    const matchesExpertise =
-      selectedExpertise === "All Expertise" ||
-      mentor.expertise.includes(selectedExpertise);
-    const matchesPrice =
-      mentor.hourlyRate >= priceRange[0] && mentor.hourlyRate <= priceRange[1];
-    const matchesRating =
-      selectedRating === "Any Rating" ||
-      mentor.rating >= Number.parseFloat(selectedRating);
-
-    return matchesSearch && matchesExpertise && matchesPrice && matchesRating;
-  });
-
+  console.log(mentors, filteredMentors, allMentors);
   return (
     <div style={{ padding: 24, background: "#f5f5f5", minHeight: "100vh" }}>
       <Row justify="space-between" align="middle" style={{ marginBottom: 20 }}>
@@ -216,22 +187,24 @@ export default function MentorsPage() {
       <Row gutter={[16, 16]}>
         {filteredMentors.length > 0 ? (
           filteredMentors.map((mentor) => (
-            <Col xs={24} md={12} key={mentor.id}>
+            <Col xs={24} md={12} key={mentor._id}>
               <Card
                 hoverable
                 cover={<Avatar size={64} src={mentor.image} />}
                 actions={[
-                  <Button type="primary" href={`/mentor/${mentor.id}`} block>
-                    View Profile
-                  </Button>,
-                  <Button href={`/booking/${mentor.id}`} icon={<VideoCameraOutlined />} />,
-                  <Button href={`/chat/${mentor.id}`} icon={<MessageOutlined />} />
+                  <Link to={`/mentor/${mentor._id}`}>
+                    <Button type="primary" block>
+                      View Profile
+                    </Button>
+                  </Link>,
+                  <Button href={`/booking/${mentor._id}`} icon={<VideoCameraOutlined />} />,
+                  <Button href={`/chat/${mentor._id}`} icon={<MessageOutlined />} />
                 ]}
               >
                 <Meta
                   title={
                     <Space direction="vertical" size={0}>
-                      <Text strong>{mentor.name}</Text>
+                      <Text strong>{mentor.fullname}</Text>
                       <Text type="secondary">{mentor.title}</Text>
                       <Text>{mentor.company}</Text>
                     </Space>
@@ -251,7 +224,7 @@ export default function MentorsPage() {
                         {mentor.bio}
                       </Paragraph>
                       <div>
-                        {mentor.expertise.slice(0, 3).map((tag, i) => (
+                        {mentor.expertise && mentor.expertise.slice(0, 3).map((tag, i) => (
                           <Tag key={i}>{tag}</Tag>
                         ))}
                       </div>
