@@ -40,7 +40,7 @@ import CareerChat from "./pages/generalportal/AIChat.jsx";
 import CareerCounsellingQuiz from "./pages/generalportal/CareerQuiz.jsx";
 import CareerPathAI from "./pages/generalportal/AI-Suggestions.jsx";
 import Counsellor from "./pages/generalportal/Counsellor.jsx";
-
+import MentorChat from "./components/MentorChat.jsx";
 
 
 const router = createBrowserRouter([
@@ -105,6 +105,11 @@ const router = createBrowserRouter([
                 path: "/path",
                 element: <CareerPathAI/>,
             },
+           //    {
+           //     path: "/chat/:receiverId/:receiverRole",
+
+            //    element: <MentorChat/>,
+           // },
             // Mentor Portal
             {
                 path: "/mentor-login",

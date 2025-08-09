@@ -184,22 +184,29 @@ export default function MentorsPage() {
       )}
 
       {/* Mentor Cards */}
-      <Row gutter={[16, 16]}>
+      <Row gutter={[8, 8]}>
         {filteredMentors.length > 0 ? (
           filteredMentors.map((mentor) => (
-            <Col xs={24} md={12} key={mentor._id}>
+            <Col xs={24} md={6} key={mentor._id}>
               <Card
                 hoverable
-                cover={<Avatar size={64} src={mentor.image} />}
+                cover={<Avatar size={32} src={mentor.image} />}
                 actions={[
-                  <Link to={`/mentor/${mentor._id}`}>
-                    <Button type="primary" block>
-                      View Profile
-                    </Button>
-                  </Link>,
-                  <Button href={`/booking/${mentor._id}`} icon={<VideoCameraOutlined />} />,
-                  <Button href={`/chat/${mentor._id}`} icon={<MessageOutlined />} />
-                ]}
+  <Link to={`/mentor/${mentor._id}`} key="view">
+    <Button type="primary" block>
+      View Profile
+    </Button>
+  </Link>,
+
+  <Link to={`/booking-page/${mentor._id}`} key="book">
+    <Button icon={<VideoCameraOutlined />} />
+  </Link>,
+ <Link to={`/chat/${mentor._id}`}>
+  <Button icon={<MessageOutlined />} />
+</Link>
+
+]}
+
               >
                 <Meta
                   title={

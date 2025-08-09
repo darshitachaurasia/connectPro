@@ -15,7 +15,6 @@ function Header() {
        {name : ' AI Skill Assessment ',slug :'/path', active :true},
         {name : ' AI Career Counsellor ',slug :'/ai', active :true},
          {name : 'Find Mentor',slug :'/mentor-page', active :true},
-        { name: 'Services', slug: '/service', active: true },
          {name : 'Resources',slug :'/Learn', active :true},
   ];
 
