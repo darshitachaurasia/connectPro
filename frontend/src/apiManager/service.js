@@ -5,7 +5,7 @@ const createService = async (data) => {
 }
 
 const editService = async (id, data) => {
-    return await AxiosInstances.put("/service" + id, data)
+    return await AxiosInstances.put("/service/" + id, data)
 
 }
 
@@ -14,8 +14,8 @@ const getAllServices = async () => {
 
 }
 
-const getServicesByMentor = async () => {
-    return await AxiosInstances.post("/service", data)
+const getServicesByMentor = async (mentorId) => {
+    return await AxiosInstances.get(`/service/mentor/${mentorId}`)
 
 }
 

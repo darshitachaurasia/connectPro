@@ -43,6 +43,42 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        title: {
+            type: String,
+        },
+        company: {
+            type: String,
+        },
+        expertise: {
+            type: [String],
+        },
+        experience: {
+            type: String,
+        },
+        services: {
+            type: [String],
+        },
+        hourlyRate: {
+            type: Number,
+        },
+        rating: {
+            type: Number,
+        },
+        bio: {
+            type: String,
+        },
+        location: {
+            type: String,
+        },
+        responseTime: {
+            type: String,
+        },
+        sessions: {
+            type: Number,
+        },
+        availability: {
+            type: String,
+        },
     },
     {
         timestamps: true,

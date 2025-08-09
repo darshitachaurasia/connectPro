@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { setToken } from "../helper";
 
 
 export const loginUser = createAsyncThunk("auth/login", async (credentials, thunkAPI) => {
@@ -14,6 +15,7 @@ export const loginUser = createAsyncThunk("auth/login", async (credentials, thun
         if (!data || data.success === false) {
             return thunkAPI.rejectWithValue(data?.message || "Login failed");
         }
+        setToken(data.data.accessToken);
         return data.data?.user || data.data || null;
     } catch (error) {
         // console.log(error);
@@ -44,11 +46,19 @@ export const signUpUser = createAsyncThunk("auth/signup", async (formData, thunk
     }
 });
 
+import { getToken } from "../helper";
+
 export const getCurrentUser = createAsyncThunk("auth/getCurrentUser", async (_, thunkAPI) => {
     try {
+        const token = getToken();
         const response = await axios.get(
             "http://localhost:4000/api/user/profile",
-            { withCredentials: true }
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
         );
         const data = response.data;
         if (!data || data.success === false) {

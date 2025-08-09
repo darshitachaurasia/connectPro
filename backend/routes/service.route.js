@@ -21,7 +21,7 @@ serviceRouter.put(
 
 // ✅ Get all services for a mentor
 serviceRouter.get(
-  "/",
+  "/mentor/:mentorId",
   verifyJWT,
   asyncHandler(serviceController.getServiceByMentor)
 );
