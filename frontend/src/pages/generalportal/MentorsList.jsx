@@ -224,8 +224,8 @@ export default function MentorsPage() {
                         {mentor.bio}
                       </Paragraph>
                       <div>
-                        {mentor.expertise && mentor.expertise.slice(0, 3).map((tag, i) => (
-                          <Tag key={i}>{tag}</Tag>
+                        {mentor.services && mentor.services.slice(0, 3).map((service, i) => (
+                          <Tag key={i}>{service.name}</Tag>
                         ))}
                       </div>
                       <Space wrap>
