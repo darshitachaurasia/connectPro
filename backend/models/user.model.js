@@ -63,6 +63,11 @@ const userSchema = new mongoose.Schema(
         },
         rating: {
             type: Number,
+            default: 0,
+        },
+        ratingCount: {
+            type: Number,
+            default: 0,
         },
         bio: {
             type: String,

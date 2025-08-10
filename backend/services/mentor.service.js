@@ -41,6 +41,7 @@ export const getMentorById = async (id) => {
         const services = await ServiceModel.find({ mentor: id,}).select("name description price duration active");
         mentor.services = services;
         mentor.experience = "5+ years";
+        mentor.price = mentor.hourlyRate;
     }
     return mentor;
 };
