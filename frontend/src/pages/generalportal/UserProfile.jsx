@@ -81,11 +81,11 @@ export default function UserProfilePage() {
 
     const onSubmit = async (data) => {
         try {
-            const payload = {
-                ...data,
-                expertise: data.expertise.split(",").map((s) => s.trim()),
-                services: data.services.split(",").map((s) => s.trim()),
-            };
+            const payload = { ...data };
+            if ((userProfile || user)?.role !== 'user') {
+                payload.expertise = data.expertise.split(",").map((s) => s.trim());
+                payload.services = data.services.split(",").map((s) => s.trim());
+            }
 
             await dispatch(updateUserProfile(payload)).unwrap();
             setUpdateMessage("✅ Profile updated successfully");
@@ -152,19 +152,23 @@ export default function UserProfilePage() {
                         <ReadOnlyField label="Role" name="role" value={(userProfile || user)?.role} />
                         
                         {/* Professional Details */}
-                        <InputField label="Title" name="title" register={register} />
-                        <InputField label="Company" name="company" register={register} />
-                        <InputField label="Expertise (comma-separated)" name="expertise" register={register} />
-                        <InputField label="Experience" name="experience" register={register} />
-                        <InputField label="Services (comma-separated)" name="services" register={register} />
-                        <InputField type="number" label="Hourly Rate" name="hourlyRate" register={register} />
-                        {/* Additional Info */}
-                        <TextareaField label="Bio" name="bio" register={register} />
-                        <StarRating mentorId={(userProfile || user)?._id} />
-                        <InputField label="Location" name="location" register={register} />
-                        <InputField label="Response Time" name="responseTime" register={register} />
-                        <InputField type="number" label="Sessions" name="sessions" register={register} />
-                        <InputField label="Availability" name="availability" register={register} />
+                        {(userProfile || user)?.role !== 'user' && (
+                            <>
+                                <InputField label="Title" name="title" register={register} />
+                                <InputField label="Company" name="company" register={register} />
+                                <InputField label="Expertise (comma-separated)" name="expertise" register={register} />
+                                <InputField label="Experience" name="experience" register={register} />
+                                <InputField label="Services (comma-separated)" name="services" register={register} />
+                                <InputField type="number" label="Hourly Rate" name="hourlyRate" register={register} />
+                                {/* Additional Info */}
+                                <TextareaField label="Bio" name="bio" register={register} />
+                                <StarRating mentorId={(userProfile || user)?._id} />
+                                <InputField label="Location" name="location" register={register} />
+                                <InputField label="Response Time" name="responseTime" register={register} />
+                                <InputField type="number" label="Sessions" name="sessions" register={register} />
+                                <InputField label="Availability" name="availability" register={register} />
+                            </>
+                        )}
                     </div>
 
                     <Button type="submit" className="w-full mt-6" disabled={isSubmitting}>

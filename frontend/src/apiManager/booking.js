@@ -1,22 +1,21 @@
-import AxiosInstances from ".";
+import api from "./index";
 
-const createBooking = async (data) => {
-  return await AxiosInstances.post("/bookings", data); // POST
+const bookingApi = {
+  createBooking: (payload) => {
+    return api.post("/bookings/create", payload);
+  },
+
+  getBookedSlots: (mentorId, date) => {
+    return api.get(`/bookings/booked-slots/${mentorId}?date=${date}`);
+  },
+
+  getUserBookings: () => {
+    return api.get("/bookings/user");
+  },
+
+  getMentorBookings: () => {
+    return api.get("/bookings/mentor");
+  },
 };
 
-const getUserBookings = async () => {
-  return await AxiosInstances.get("/bookings/user"); // GET
-};
-
-import { getToken } from "../helper";
-
-const getMentorBookings = async () => {
-  const token = getToken();
-  return await AxiosInstances.get("/bookings/mentor", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }); // GET
-};
-
-export default { createBooking, getUserBookings, getMentorBookings };
+export default bookingApi;

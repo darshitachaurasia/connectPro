@@ -27,8 +27,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import mentorApi from "../../apiManager/mentor";
-// Assume createBooking action exists in your booking slice
-// import { createBooking } from "./redux/bookingSlice"; 
+import { createBooking } from "../../redux/bookingSlice";
+import bookingApi from "../../apiManager/booking";
 
 const { Title, Text, Link } = Typography;
 
@@ -51,6 +51,7 @@ export default function BookingPage() {
   const [message, setMessage] = useState("");
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [bookedSlots, setBookedSlots] = useState([]);
   
   // --- New Authentication & Data Check Effect ---
   useEffect(() => {
@@ -74,6 +75,22 @@ export default function BookingPage() {
     };
     fetchMentor();
   }, [user, mentorId, navigate, location]);
+
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      if (!selectedDate) return;
+      try {
+        const response = await bookingApi.getBookedSlots(
+          mentorId,
+          selectedDate.format("YYYY-MM-DD")
+        );
+        setBookedSlots(response.data.bookedSlots);
+      } catch (error) {
+        console.error("Failed to fetch booked slots", error);
+      }
+    };
+    fetchBookedSlots();
+  }, [selectedDate, mentorId]);
 
   const handleNext = () => setStep((prev) => (prev < 3 ? prev + 1 : prev));
   const handlePrevious = () => setStep((prev) => (prev > 1 ? prev - 1 : prev));
@@ -106,7 +123,7 @@ export default function BookingPage() {
 
     console.log("Dispatching booking:", bookingPayload);
     // Uncomment the line below when your action is ready
-    // dispatch(createBooking(bookingPayload));
+    dispatch(createBooking(bookingPayload));
     
     setStep(4); // Proceed to success screen
   };
@@ -141,7 +158,7 @@ export default function BookingPage() {
           subTitle={`Your session with ${mentor.fullname} for ${selectedService.name} on ${selectedDate.format("MMMM D, YYYY")} at ${selectedTime} is booked.`}
           extra={[
             // These buttons now correctly navigate the user after booking
-            <Button type="primary" key="dashboard" onClick={() => navigate("/dashboard")}>Go to Dashboard</Button>,
+            <Button type="primary" key="dashboard" onClick={() => navigate("/booking-details")}>Booking Details</Button>,
             <Button key="profile" onClick={() => navigate(`/mentor/${mentorId}`)}>View Mentor Profile</Button>,
           ]}
         />
@@ -183,11 +200,20 @@ export default function BookingPage() {
               </Card>
               <Card title={<Flex align="center" gap="small"><ClockCircleOutlined /> Select Time</Flex>}>
                 <div className="flex flex-wrap gap-2">
-                  {timeSlots.map((time) => (
-                    <Button key={time} type={selectedTime === time ? "primary" : "default"} onClick={() => setSelectedTime(time)} className="h-12 flex-grow">
-                      {time}
-                    </Button>
-                  ))}
+                  {timeSlots.map((time) => {
+                    const isBooked = bookedSlots.includes(time);
+                    return (
+                      <Button
+                        key={time}
+                        type={selectedTime === time ? "primary" : "default"}
+                        onClick={() => setSelectedTime(time)}
+                        className="h-12 flex-grow"
+                        disabled={isBooked}
+                      >
+                        {time}
+                      </Button>
+                    );
+                  })}
                 </div>
               </Card>
             </div>

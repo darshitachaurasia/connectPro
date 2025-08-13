@@ -17,46 +17,18 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateUserProfile = asyncHandler(async (req, res) => {
-    const {
-        fullname,
-        bio,
-        expertise,
-        hourlyRate,
-        title,
-        company,
-        experience,
-        services,
-        location,
-        responseTime,
-        sessions,
-        availability,
-        profilePicture,
-    } = req.body;
+    const { body: updateData } = req;
     const userId = req.user._id;
 
-    const user = await User.findById(userId);
-    if (!user) {
+    const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+    ).select("-password -refreshToken");
+
+    if (!updatedUser) {
         throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
-
-    // Update only the fields that are present in the request body
-    if (fullname) user.fullname = fullname;
-    if (bio) user.bio = bio;
-    if (expertise) user.expertise = expertise;
-    if (hourlyRate) user.hourlyRate = hourlyRate;
-    if (title) user.title = title;
-    if (company) user.company = company;
-    if (experience) user.experience = experience;
-    if (services) user.services = services;
-    if (location) user.location = location;
-    if (responseTime) user.responseTime = responseTime;
-    if (sessions) user.sessions = sessions;
-    if (availability) user.availability = availability;
-    if (profilePicture) user.profilePicture = profilePicture;
-
-    await user.save({ validateBeforeSave: false });
-
-    const updatedUser = await User.findById(userId).select("-password -refreshToken");
 
     return res.status(200).json(new ApiResponse(200, updatedUser, "Profile updated successfully"));
 });
