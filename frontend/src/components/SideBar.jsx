@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function SideBar() {
+  const { user } = useSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [openSection, setOpenSection] = useState(null);
 
@@ -11,13 +13,18 @@ function SideBar() {
 
   // 🧭 Add paths for each page
   const pages = {
-    authentication: [  
-      { name: 'SignUp', path: '/user-signup' },
+    authentication: [
+      ...(user
+        ? []
+        : [
+            { name: 'SignUp', path: '/user-signup' },
+            { name: 'Login', path: '/login' },
+          ]),
       { name: 'User Profile', path: '/profile' },
-      { name: 'Login', path: '/login' },
-      { name:  'Dashboard', path: '/user-login' }
-     
-      
+      {
+        name: 'Dashboard',
+        path: user?.role === 'mentor' ? '/mentor-login' : '/user-login',
+      },
     ],
     booking: [
      { name: 'Mentors List', path: '/mentors' },

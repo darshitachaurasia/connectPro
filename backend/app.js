@@ -11,6 +11,7 @@ import userRouter from './routes/user.route.js';
 import mentorRouter from './routes/mentor.route.js';
 import serviceRouter from './routes/service.route.js';
 import bookingRouter from './routes/booking.routes.js';
+import paymentRouter from './routes/payment.route.js';
 import ApiError from './utils/ApiError.js';
 import asyncHandler from './utils/asyncHandler.js';
 
@@ -44,8 +45,13 @@ app.use('/api/mentor', mentorRouter);
 app.use('/api/service', serviceRouter);
 app.use('/api/bookings', bookingRouter);
 
+
 // Career Suggestions Route
 app.post('/api/career-suggestions', asyncHandler(async (req, res) => {
+
+app.use('/api/payment', paymentRouter);
+app.use('/api/career-suggestions', asyncHandler(async (req, res) => {
+
   let { skills } = req.body;
   console.log("📩 Received skills:", skills);
 
@@ -88,7 +94,7 @@ Here are 3 general career options based on your skills:
 }));
 
 // Daily.co Room Creation
-app.post("/api/create-room", async (req, res) => {
+//app.post("/api/create-room", async (req, res) => {
   try {
     const { mentorId, menteeId, sessionTime } = req.body;
 
@@ -114,17 +120,17 @@ app.post("/api/create-room", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Could not create room" });
   }
-});
+//});
 
 // Daily.co Get Room
-app.get("/api/get-room/:sessionId", async (req, res) => {
+//app.get("/api/get-room/:sessionId", async (req, res) => {
   try {
     // Replace with DB lookup
     res.json({ roomUrl: "https://your-daily-domain.daily.co/sample-room" });
   } catch (error) {
     res.status(500).json({ error: "Could not fetch room" });
   }
-});
+//});
 
 // Root route
 app.get('/', (req, res) => {
@@ -133,6 +139,7 @@ app.get('/', (req, res) => {
 
 // Error Handler Middleware
 app.use((err, req, res, next) => {
+  console.log(err);
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
       success: false,
@@ -177,12 +184,7 @@ app.post("/send-email", async (req, res) => {
       <p>Your meeting has been booked. Here’s the link: 
       <a href="https://meet.google.com/fsx-mntg-kbc">Join Meeting</a></p>
     `,
-    attachments: [
-      {
-        filename: "trophy.png",
-        path: path.join(__dirname, "trophy.png"),
-      },
-    ],
+   
   };
 
   try {
