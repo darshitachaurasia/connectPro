@@ -10,6 +10,7 @@ import userRouter from './routes/user.route.js';
 import mentorRouter from './routes/mentor.route.js';
 import serviceRouter from './routes/service.route.js';
 import bookingRouter from './routes/booking.routes.js';
+import paymentRouter from './routes/payment.route.js';
 import ApiError from './utils/ApiError.js';
 import asyncHandler from './utils/asyncHandler.js';
 
@@ -36,6 +37,7 @@ app.use('/api/user', userRouter);
 app.use('/api/mentor', mentorRouter);
 app.use('/api/service', serviceRouter);
 app.use('/api/bookings', bookingRouter);
+app.use('/api/payment', paymentRouter);
 app.use('/api/career-suggestions', asyncHandler(async (req, res) => {
   let { skills } = req.body;
   console.log("📩 Received skills:", skills);
