@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Spin } from "antd";
 import moment from "moment";
 import booking from "../../apiManager/booking";
-import MentorDashboard from "./MentorDashboard";
 
 const MentorBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -25,32 +24,33 @@ const MentorBookings = () => {
     fetchBookings();
   }, []);
 
-  const filteredBookings = bookings.filter((b) =>
-    activeTab === "upcoming"
-      ? moment(b.dateAndTime).isAfter(moment())
-      : moment(b.dateAndTime).isBefore(moment())
-  );
-
   const columns = [
     {
+      title: "User",
+      dataIndex: "userId",
+      key: "user",
+      render: (userId) => userId?.fullname || "N/A",
+    },
+    {
       title: "Date",
-      dataIndex: "dateAndTime",
+      dataIndex: "dateTime",
       key: "date",
-      render: (text) => moment(text).format("DD-MM-YYYY"),
+      render: (text) => moment(new Date(text)).format("DD-MM-YYYY"),
     },
     {
       title: "Time",
-      dataIndex: "dateAndTime",
+      dataIndex: "dateTime",
       key: "time",
-      render: (text) => moment(text).format("hh:mm A"),
+      render: (text) => moment(new Date(text)).format("hh:mm A"),
     },
     {
       title: "Price",
-      dataIndex: "price",
+      dataIndex: "service",
       key: "price",
-      render: (price) => `$${price}`,
+      render: (service) => `₹${service?.price}`,
     },
   ];
+  console.log("Bookings:", bookings);
 
   return (
     
@@ -86,7 +86,11 @@ const MentorBookings = () => {
         <Spin spinning={loading}>
           <Table
             columns={columns}
-            dataSource={filteredBookings}
+            dataSource={bookings.filter((b) =>
+              activeTab === "upcoming"
+                ? moment(new Date(b.dateTime)).isAfter(moment())
+                : moment(new Date(b.dateTime)).isBefore(moment())
+            )}
             rowKey="_id"
             bordered
             pagination={{ pageSize: 5 }}

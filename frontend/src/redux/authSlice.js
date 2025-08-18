@@ -75,10 +75,16 @@ export const getCurrentUser = createAsyncThunk("auth/getCurrentUser", async (_, 
 
 export const logoutUser = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
     try {
+        const token = getToken();
         const response = await axios.post(
             "http://localhost:4000/api/auth/logout",
             {},
-            { withCredentials: true }
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
         );
         const data = response.data;
         if (!data || data.success === false) {

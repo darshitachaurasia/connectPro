@@ -94,23 +94,28 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-    const { refreshToken } = req.cookies;
-    if (!refreshToken) {
-        throw new ApiError(400, "No refresh token provided.");
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken: undefined
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    const options = {
+        httpOnly: true,
+        secure: true
     }
 
-    const user = await User.findOne({ refreshToken });
-    if (!user) {
-        throw new ApiError(404, "User not found.");
-    }
-
-    user.refreshToken = null;
-    await user.save({ validateBeforeSave: false });
-
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-
-    return res.status(200).json(new ApiResponse(200, null, "User Logged Out Successfully."));
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "User logged out"))
 })
 
 const sendOtp = asyncHandler(async (req, res) => {

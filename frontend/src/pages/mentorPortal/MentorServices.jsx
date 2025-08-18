@@ -3,7 +3,7 @@ import { Button, Input, Modal, Form, Spin } from "antd";
 import toast from "react-hot-toast";
 import { FiPlus } from "react-icons/fi";
 import ServiceCard from "../../components/ServiceCard";
-import service from "../../apiManager/service";
+import apiService from "../../apiManager/service";
 import { useSelector } from "react-redux";
 
 const MentorServices = () => {
@@ -12,6 +12,15 @@ const MentorServices = () => {
   const [editingService, setEditingService] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user } = useSelector((state) => state.auth);
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (editingService) {
+      form.setFieldsValue(editingService);
+    } else {
+      form.resetFields();
+    }
+  }, [editingService, form]);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -21,7 +30,7 @@ const MentorServices = () => {
           toast.error("Mentor ID is missing. Please login again.");
           return;
         }
-        const response = await service.getServicesByMentor(user._id);
+        const response = await apiService.getServicesByMentor(user._id);
         setServices(response?.data?.services || []);
       } catch (error) {
         toast.error("Failed to load services. Please try again later.");
@@ -37,9 +46,10 @@ const MentorServices = () => {
   const handleCreateService = async (values) => {
     setLoading(true);
     try {
-      const response = await service.createService(values);
+      const response = await apiService.createService(values);
       setServices((prev) => [...prev, response?.data?.service]);
       setIsModalVisible(false);
+      form.resetFields();
       toast.success("Service created successfully!");
     } catch {
       toast.error("Failed to create service. Please try again.");
@@ -51,7 +61,7 @@ const MentorServices = () => {
   const handleEditService = async (values) => {
     setLoading(true);
     try {
-      const response = await service.editService(editingService._id, values);
+      const response = await apiService.editService(editingService._id, values);
       setServices((prev) =>
         prev.map((svc) =>
           svc._id === editingService._id ? response.data.service : svc
@@ -59,6 +69,7 @@ const MentorServices = () => {
       );
       setIsModalVisible(false);
       setEditingService(null);
+      form.resetFields();
       toast.success("Service updated successfully!");
     } catch {
       toast.error("Failed to update service. Please try again.");
@@ -68,8 +79,33 @@ const MentorServices = () => {
   };
 
   const handleEdit = (service) => {
+    if (!service.active) {
+      toast.error("You cannot edit a disabled service.");
+      return;
+    }
     setEditingService(service);
     setIsModalVisible(true);
+  };
+
+  const handleToggleActive = async (service) => {
+    setLoading(true);
+    try {
+      const response = await apiService.editService(service._id, {
+        active: !service.active,
+      });
+      setServices((prev) =>
+        prev.map((s) => (s._id === service._id ? response.data.service : s))
+      );
+      toast.success(
+        `Service ${
+          response.data.service.active ? "enabled" : "disabled"
+        } successfully!`
+      );
+    } catch (error) {
+      toast.error("Failed to update service status. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -91,10 +127,12 @@ const MentorServices = () => {
         onCancel={() => {
           setIsModalVisible(false);
           setEditingService(null);
+          form.resetFields();
         }}
         footer={null}
       >
         <Form
+          form={form}
           onFinish={editingService ? handleEditService : handleCreateService}
           initialValues={editingService}
         >
@@ -139,6 +177,7 @@ const MentorServices = () => {
               key={svc._id}
               service={svc}
               onEdit={() => handleEdit(svc)}
+              onToggleActive={() => handleToggleActive(svc)}
             />
           ))}
         </div>

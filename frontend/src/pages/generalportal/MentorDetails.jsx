@@ -50,8 +50,19 @@ function MentorDetails() {
             <span className="font-semibold text-blue-600">Experience:</span> {mentor.experience}
           </p>
           <p>
-            <span className="font-semibold text-blue-600">Services:</span>{" "}
-            {mentor.services?.join(", ") || "N/A"}
+            <span className="font-semibold text-blue-600">Expertise:</span> {mentor.expertise?.join(', ')}
+          </p>
+          <p>
+            <span className="font-semibold text-blue-600">Price:</span> ${mentor.price}/hr
+          </p>
+          <p className="flex items-center">
+            <span className="font-semibold text-blue-600 mr-2">Rating:</span> 
+            <span className="text-yellow-500">{'★'.repeat(Math.round(mentor.rating))}</span>
+            <span className="text-gray-500">{'☆'.repeat(5 - Math.round(mentor.rating))}</span>
+            <span className="ml-2 text-blue-700">({mentor.rating?.toFixed(1)})</span>
+          </p>
+          <p>
+            <span className="font-semibold text-blue-600">Number of Services:</span> {mentor.services?.filter(service => service.active).length || 0}
           </p>
         </div>
 
