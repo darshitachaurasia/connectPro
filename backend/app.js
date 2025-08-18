@@ -22,8 +22,12 @@ console.log("🔑 GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "Loaded" : "Mis
 const app = express();
 
 // Middleware
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((s) => s.trim());
+
 app.use(cors({
-  origin: 'http://localhost:5173', // Replace with your frontend domain
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
