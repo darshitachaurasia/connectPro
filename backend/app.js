@@ -24,7 +24,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const DAILY_API_KEY = process.env.DAILY_API_KEY;
+//const DAILY_API_KEY = process.env.DAILY_API_KEY;
 
 const app = express();
 
@@ -47,7 +47,6 @@ app.use('/api/bookings', bookingRouter);
 
 
 // Career Suggestions Route
-app.post('/api/career-suggestions', asyncHandler(async (req, res) => {
 
 app.use('/api/payment', paymentRouter);
 app.use('/api/career-suggestions', asyncHandler(async (req, res) => {
@@ -94,7 +93,7 @@ Here are 3 general career options based on your skills:
 }));
 
 // Daily.co Room Creation
-//app.post("/api/create-room", async (req, res) => {
+/**app.post("/api/create-room", async (req, res) => {
   try {
     const { mentorId, menteeId, sessionTime } = req.body;
 
@@ -122,7 +121,7 @@ Here are 3 general career options based on your skills:
   }
 //});
 
-// Daily.co Get Room
+/**  Daily.co Get Room
 //app.get("/api/get-room/:sessionId", async (req, res) => {
   try {
     // Replace with DB lookup
@@ -130,7 +129,7 @@ Here are 3 general career options based on your skills:
   } catch (error) {
     res.status(500).json({ error: "Could not fetch room" });
   }
-//});
+//});*/
 
 // Root route
 app.get('/', (req, res) => {
@@ -165,8 +164,8 @@ app.use((err, req, res, next) => {
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
