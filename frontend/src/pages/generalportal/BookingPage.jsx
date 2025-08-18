@@ -29,12 +29,17 @@ import { motion } from "framer-motion";
 import mentorApi from "../../apiManager/mentor";
 import { createBooking } from "../../redux/bookingSlice";
 import bookingApi from "../../apiManager/booking";
+import paymentApi from "../../apiManager/payment";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 const { Title, Text, Link } = Typography;
 
 const timeSlots = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
 
 export default function BookingPage() {
+  // Stripe init
+  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
   // --- New Hooks for Redux & Routing ---
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -96,7 +101,7 @@ export default function BookingPage() {
   const handlePrevious = () => setStep((prev) => (prev > 1 ? prev - 1 : prev));
 
   // --- Updated handleBooking function ---
-  const handleBooking = () => {
+  const handleBooking = (transactionId) => {
     // Combine date and time to create a full ISODate string for the backend
     const timeParts = selectedTime.match(/(\d+):(\d+)\s*(AM|PM)/);
     if (!timeParts) return; // Or show an error
@@ -117,7 +122,7 @@ export default function BookingPage() {
       paymentDetails: {
         method: paymentMethod,
         amount: finalTotal,
-        transactionId: `txn_${Date.now()}` // Mock transaction ID
+  transactionId: transactionId || `txn_${Date.now()}` // Use Stripe/Razorpay id if provided
       }
     };
 
@@ -126,6 +131,15 @@ export default function BookingPage() {
     dispatch(createBooking(bookingPayload));
     
     setStep(4); // Proceed to success screen
+  };
+
+  const handlePrimaryAction = () => {
+    if (step === 2) {
+      if (paymentMethod === 'stripe') return; // Stripe button is inside form
+      handleBooking();
+    } else {
+      handleNext();
+    }
   };
 
   const disabledDate = (current) => {
@@ -139,6 +153,67 @@ export default function BookingPage() {
   const totalPrice = selectedService ? selectedService.price : 0;
   const platformFee = Math.round(totalPrice * 0.05);
   const finalTotal = totalPrice + platformFee;
+
+  // Inline component for Stripe payment
+  const StripeCheckoutForm = ({ amount }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [processing, setProcessing] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+
+    const handleStripePay = async () => {
+      if (!stripe || !elements) return;
+      setProcessing(true);
+      setErrorMsg("");
+      try {
+        const intent = await paymentApi.createStripeIntent({
+          amount, // dollars
+          currency: 'usd',
+          metadata: {
+            mentorId,
+            userId: user?._id,
+            serviceId: selectedService?._id,
+          },
+        });
+        if (!intent?.success || !intent?.clientSecret) {
+          throw new Error('Failed to create payment intent');
+        }
+        const card = elements.getElement(CardElement);
+        const { error, paymentIntent } = await stripe.confirmCardPayment(intent.clientSecret, {
+          payment_method: { card },
+        });
+        if (error) {
+          setErrorMsg(error.message || 'Payment failed.');
+          return;
+        }
+        if (paymentIntent?.status === 'succeeded') {
+          // Complete booking with Stripe transaction id
+          handleBooking(paymentIntent.id);
+        } else {
+          setErrorMsg('Payment not completed.');
+        }
+      } catch (e) {
+        setErrorMsg(e.message || 'Payment error');
+      } finally {
+        setProcessing(false);
+      }
+    };
+
+    return (
+      <div className="mt-6">
+        {!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && (
+          <Alert type="warning" message="Stripe publishable key missing" description="Set VITE_STRIPE_PUBLISHABLE_KEY in your .env to enable Stripe payments." showIcon className="mb-3" />
+        )}
+        <div className="p-4 border rounded-md bg-white">
+          <CardElement options={{ hidePostalCode: true }} />
+        </div>
+        {errorMsg && <div className="text-red-500 mt-2 text-sm">{errorMsg}</div>}
+        <Button type="primary" className="mt-4" onClick={handleStripePay} disabled={processing || !stripe}>
+          {processing ? 'Processing…' : `Pay $${amount}`}
+        </Button>
+      </div>
+    );
+  };
 
   // --- Step 4: Confirmation Screen (Unchanged but now follows a real dispatch) ---
   if (!mentor) {
@@ -240,6 +315,12 @@ export default function BookingPage() {
                            <div><Text strong>Razorpay</Text><br/><Text type="secondary">UPI, Net Banking, Wallets</Text></div>
                         </Flex>
                     </div>
+                    <div onClick={() => setPaymentMethod('stripe')} className={`p-4 border rounded-lg cursor-pointer ${paymentMethod === 'stripe' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
+                        <Flex align="center" gap="middle">
+                           <Radio checked={paymentMethod === 'stripe'}/>
+                           <div><Text strong>Stripe</Text><br/><Text type="secondary">Pay securely with card via Stripe</Text></div>
+                        </Flex>
+                    </div>
                 </div>
 
                {paymentMethod === "card" && (
@@ -255,6 +336,12 @@ export default function BookingPage() {
                     <Input placeholder="CVV" />
                   </div>
                 </div>
+               )}
+
+               {paymentMethod === 'stripe' && (
+                 <Elements stripe={stripePromise}>
+                   <StripeCheckoutForm amount={finalTotal} />
+                 </Elements>
                )}
             </Card>
             <Alert message="Secure Payment" description="Your payment information is encrypted and secure." type="success" showIcon icon={<SafetyCertificateOutlined />} />
@@ -292,7 +379,7 @@ export default function BookingPage() {
             {renderStepContent()}
             <div className="flex justify-between mt-6">
               <Button onClick={handlePrevious} disabled={step === 1}>Previous</Button>
-              <Button type="primary" onClick={step === 2 ? handleBooking : handleNext} disabled={(step === 1 && !canProceedStep1) || (step === 2 && !canProceedStep2)}>
+              <Button type="primary" onClick={handlePrimaryAction} disabled={(step === 1 && !canProceedStep1) || (step === 2 && (!canProceedStep2 || paymentMethod === 'stripe'))}>
                 {step === 2 ? "Complete Booking" : "Next"}
               </Button>
             </div>

@@ -12,6 +12,8 @@
     "dependencies": {
         "@langchain/google-genai": "^0.2.16",
         "@reduxjs/toolkit": "^2.8.2",
+        "@stripe/react-stripe-js": "^3.9.0",
+        "@stripe/stripe-js": "^7.8.0",
         "@tailwindcss/vite": "^4.1.11",
         "antd": "^5.26.6",
         "axios": "^1.10.0",
