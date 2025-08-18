@@ -29,8 +29,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const app = express();
 
 // Middleware
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((s) => s.trim());
+
 app.use(cors({
-  origin: 'http://localhost:5173', // update with frontend domain in prod
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
