@@ -12,7 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
+    "@langchain/openai": "^1.2.12",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
@@ -22,10 +22,11 @@
     "express": "^5.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^1.2.29",
     "mongoose": "^8.16.3",
     "multer": "^2.0.1",
     "nodemailer": "^7.0.5",
-    "openai": "^5.12.1",
+    "openai": "^5.23.2",
     "razorpay": "^2.9.6",
     "socket.io": "^4.8.1",
     "stripe": "^16.6.0"

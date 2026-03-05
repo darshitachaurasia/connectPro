@@ -31,7 +31,7 @@ import MentorDetails from "./pages/generalportal/MentorDetails.jsx";
 import BookingManagement from "./pages/adminPortal/BookingManagement.jsx";
 
 import LearnHeader from "./pages/generalportal/Learn.jsx";
-
+import EmailSender from "./components/EmailSender.jsx";
 import MentorServices from "./pages/mentorPortal/MentorServices.jsx";
 import MentorBookings from "./pages/mentorPortal/MentorBookings.jsx";
 import MentorsPage from "./pages/generalportal/MentorsList.jsx";
@@ -104,6 +104,10 @@ const router = createBrowserRouter([
               {
                 path: "/path",
                 element: <CareerPathAI/>,
+            },
+               {
+                path: "/send-email",
+                element: <EmailSender/>,
             },
            //    {
            //     path: "/chat/:receiverId/:receiverRole",

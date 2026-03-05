@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const CareerTestBanner = () => {
   return (
@@ -13,10 +14,11 @@ const CareerTestBanner = () => {
       </div>
 
       {/* Button */}
-      <div className="mt-6 md:mt-0">
-        <button className="bg-blue-700 text-white px-6 py-3 rounded-md hover:bg-blue-800 transition">
+      <div className="mt-6 md:mt-0 ml-1">
+        <Link to={'/quiz'}><button className="bg-blue-700 text-white px-6 py-3 rounded-md hover:bg-blue-800 transition">
           Start Career Test
         </button>
+        </Link>
       </div>
     </section>
   );

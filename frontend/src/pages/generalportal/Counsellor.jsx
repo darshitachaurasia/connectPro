@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Layout, Typography, Input, Button, Card, Spin, Alert } from "antd";
-import { useCareerGenerator } from "../../apiManager/useCareerGenerator"
+import { useCareerCounsellor} from "../../apiManager/useCareerCounsellor"
 import ReactMarkdown from "react-markdown";
 
 const { Title } = Typography;
@@ -14,7 +14,7 @@ const SUGGESTION_PROMPTS = [
 
 export default function Counsellor() {
   const [prompt, setPrompt] = useState("");
-  const { career, loading, error, generateCareer } = useCareerGenerator();
+  const { career, loading, error, generateCareer } = useCareerCounsellor();
 
   const handleGenerate = (currentPrompt) => {
     if (currentPrompt.trim()) {

@@ -11,22 +11,22 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 
-console.log("🔑 Loaded GEMINI_API_KEY?", process.env.GEMINI_API_KEY ? "Yes" : "No");
+console.log("🔑 Loaded GEMINI_API_KEY?", process.env.LLM_API_KEY ? "Yes" : "No");
 
 connectDB().then(() => {
   const PORT = process.env.PORT || 4000;
   const server = http.createServer(app);
 
-  const io = new Server(server, {
+  /**const io = new Server(server, {
     cors: {
       origin: process.env.FRONTEND_URL || 'http://localhost:5173',
       methods: ['GET', 'POST'],
     },
-  });
+  });*/
 
-  const onlineUsers = {};
+  //const onlineUsers = {};
 
-  io.on('connection', (socket) => {
+  /**io.on('connection', (socket) => {
     console.log('⚡ User connected:', socket.id);
 
     socket.on('join', ({ userId }) => {
@@ -64,7 +64,7 @@ connectDB().then(() => {
         }
       }
     });
-  });
+  });**/
 
   server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 });

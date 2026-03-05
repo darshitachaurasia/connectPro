@@ -58,7 +58,7 @@ export default function MentorshipFlow() {
       </div>
 
       {/* CTA Button */}
-      <Link href="/" className="mt-12">
+      <Link to ="/quiz" className="mt-12">
         <div className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-lg flex items-center gap-2">
           Start Your Journey <ArrowRight className="w-5 h-5" />
         </div>
