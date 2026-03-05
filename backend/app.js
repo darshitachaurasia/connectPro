@@ -24,25 +24,37 @@ import asyncHandler from "./utils/asyncHandler.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const allowedOrigins = [
-  "https://connect-pro-9z7w.vercel.app/ai",
   "http://localhost:5173",
   "https://connect-pro-rust.vercel.app",
+  "https://connect-pro-9z7w.vercel.app" // Removed the /ai
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        // This will show up in your Render logs to tell you what origin was blocked
+        console.error(`CORS blocked for origin: ${origin}`);
         callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"]
   })
 );
-app.use(express.json());
+
+// Explicitly handle preflight across all routes
+app.options("*", cors()); 
+
+app.use(express.json({ limit: "16kb" }));
 app.use(cookieParser());
 
 app.post(
