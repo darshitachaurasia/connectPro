@@ -14,8 +14,9 @@ export function useCareerCounsellor() {
     setError(null);
 
     try {
+      const API = import.meta.env.VITE_BACKEND_URL;
       const response = await axios.post(
-        "http://localhost:4000/api/career-guide",
+        `${API}/career-guide`,
         { career: prompt }
       );
 

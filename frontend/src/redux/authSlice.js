@@ -4,9 +4,10 @@ import { setToken } from "../helper";
 
 
 export const loginUser = createAsyncThunk("auth/login", async (credentials, thunkAPI) => {
+    const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000/api";
     try {
         const response = await axios.post(
-            "http://localhost:4000/api/auth/login",
+            `${API_BASE}/auth/login`,
             credentials,
             { withCredentials: true }
         );
@@ -29,7 +30,7 @@ export const loginUser = createAsyncThunk("auth/login", async (credentials, thun
 export const signUpUser = createAsyncThunk("auth/signup", async (formData, thunkAPI) => {
     try {
         const response = await axios.post(
-            "http://localhost:4000/api/auth/register",
+            `${API_BASE}/auth/register`,
             formData,
             { withCredentials: true }
         );
@@ -52,7 +53,7 @@ export const getCurrentUser = createAsyncThunk("auth/getCurrentUser", async (_, 
     try {
         const token = getToken();
         const response = await axios.get(
-            "http://localhost:4000/api/user/profile",
+            `${API_BASE}/api/user/profile`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -77,7 +78,7 @@ export const logoutUser = createAsyncThunk("auth/logout", async (_, thunkAPI) =>
     try {
         const token = getToken();
         const response = await axios.post(
-            "http://localhost:4000/api/auth/logout",
+            `${API_BASE}/auth/logout`,
             {},
             {
                 headers: {
@@ -102,7 +103,7 @@ export const logoutUser = createAsyncThunk("auth/logout", async (_, thunkAPI) =>
 export const sendOtp = createAsyncThunk("auth/sendOtp", async (email, thunkAPI) => {
     try {
         const response = await axios.post(
-            "http://localhost:4000/api/auth/send-otp",
+            `${API_BASE}/auth/send-otp`,
             {},
             { withCredentials: true }
         );
@@ -123,7 +124,7 @@ export const sendOtp = createAsyncThunk("auth/sendOtp", async (email, thunkAPI) 
 export const verifyOtp = createAsyncThunk("auth/verifyOtp", async (otp, thunkAPI) => {
     try {
         const response = await axios.post(
-            "http://localhost:4000/api/auth/verify-otp",
+            `${API_BASE}/auth/verify-otp`,
             { otp },
             { withCredentials: true }
         );

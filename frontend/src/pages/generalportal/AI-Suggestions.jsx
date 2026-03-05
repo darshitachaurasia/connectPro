@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { BASE_URL } from "../../const/env.const";
+
 
 const CareerPathAI = () => {
   const [skills, setSkills] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-
+ const API = import.meta.env.VITE_BACKEND_URL;
  const handleGenerateSuggestions = async () => {
   try {
-    const res = await fetch(`${BASE_URL}/career-suggestions`, {
+    const res = await fetch(`${API}/career-suggestions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ skills }),
