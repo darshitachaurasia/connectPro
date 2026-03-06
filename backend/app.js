@@ -21,39 +21,65 @@ import ApiError from "./utils/ApiError.js";
 import asyncHandler from "./utils/asyncHandler.js";
 
 const app = express();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 1. SAFE CORS CONFIG (At the absolute top)
+/* =========================
+   CORS CONFIGURATION
+========================= */
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://connect-pro-rust.vercel.app",
   "https://connect-pro-9z7w.vercel.app"
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS Blocked"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "Cookie"]
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
 
-// 2. PREFLIGHT HANDLER
-app.options("*", cors()); 
+      // allow requests without origin (mobile apps, curl, postman)
+      if (!origin) return callback(null, true);
 
-// 3. GLOBAL MIDDLEWARE
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS Blocked"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"]
+  })
+);
+
+/* =========================
+   PREFLIGHT HANDLER
+========================= */
+
+app.options("*", (req, res) => {
+  res.sendStatus(200);
+});
+
+/* =========================
+   GLOBAL MIDDLEWARE
+========================= */
+
 app.use(express.json({ limit: "16kb" }));
 app.use(cookieParser());
 
-// 4. MAIN ROUTES
-app.get("/", (req, res) => res.send("Welcome to the backend server!"));
+/* =========================
+   ROOT ROUTE
+========================= */
+
+app.get("/", (req, res) => {
+  res.send("Welcome to the backend server!");
+});
+
+/* =========================
+   MAIN API ROUTES
+========================= */
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
@@ -62,28 +88,54 @@ app.use("/api/service", serviceRouter);
 app.use("/api/bookings", bookingRouter);
 app.use("/api/payment", paymentRouter);
 
-// AI Career Routes
-app.post("/api/career-guide", asyncHandler(async (req, res) => {
-  const { career } = req.body;
-  if (!career || career.trim() === "") {
-    return res.status(400).json({ error: "Career field is required" });
-  }
-  const result = await generateCareerGuide(career);
-  res.json({ success: true, guide: result });
-}));
+/* =========================
+   AI CAREER ROUTES
+========================= */
 
-app.post("/api/career-suggestions", asyncHandler(async (req, res) => {
-  let { skills } = req.body;
-  if (!skills) return res.status(400).json({ error: "Skills required" });
-  
-  const skillsStr = Array.isArray(skills) ? skills.join(", ") : skills;
-  const reply = await generateCareerSuggestions(skillsStr);
-  res.json({ success: true, suggestions: reply });
-}));
+app.post(
+  "/api/career-guide",
+  asyncHandler(async (req, res) => {
+    const { career } = req.body;
 
-// 5. EMAIL SERVICE
+    if (!career || career.trim() === "") {
+      return res.status(400).json({ error: "Career field is required" });
+    }
+
+    const result = await generateCareerGuide(career);
+
+    res.json({
+      success: true,
+      guide: result,
+    });
+  })
+);
+
+app.post(
+  "/api/career-suggestions",
+  asyncHandler(async (req, res) => {
+    let { skills } = req.body;
+
+    if (!skills) {
+      return res.status(400).json({ error: "Skills required" });
+    }
+
+    const skillsStr = Array.isArray(skills) ? skills.join(", ") : skills;
+
+    const reply = await generateCareerSuggestions(skillsStr);
+
+    res.json({
+      success: true,
+      suggestions: reply,
+    });
+  })
+);
+
+/* =========================
+   EMAIL SERVICE
+========================= */
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Shorthand for gmail
+  service: "gmail",
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
@@ -92,6 +144,7 @@ const transporter = nodemailer.createTransport({
 
 app.post("/api/send-email", async (req, res) => {
   const { email, name } = req.body;
+
   const mailOptions = {
     from: process.env.SMTP_USER,
     to: email,
@@ -101,15 +154,25 @@ app.post("/api/send-email", async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    res.json({ success: true });
+
+    res.json({
+      success: true,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
 
-// 6. GLOBAL ERROR HANDLER (Keep this at the end)
+/* =========================
+   GLOBAL ERROR HANDLER
+========================= */
+
 app.use((err, req, res, next) => {
   const statusCode = err instanceof ApiError ? err.statusCode : 500;
+
   res.status(statusCode).json({
     success: false,
     message: err.message || "Internal Server Error",
