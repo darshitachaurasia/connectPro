@@ -1,70 +1,27 @@
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import connectDB from './config/db.js';
-import app from './app.js';
-import { Server } from 'socket.io';
-import http from 'http';
-import Message from './models/message.model.js';
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import http from "http";
+
+import connectDB from "./config/db.js";
+import app from "./app.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.resolve(__dirname, './.env') });
 
-console.log("🔑 Loaded GEMINI_API_KEY?", process.env.LLM_API_KEY ? "Yes" : "No");
+dotenv.config({ path: path.resolve(__dirname, "./.env") });
+
+console.log(
+  "🔑 Loaded LLM_API_KEY?",
+  process.env.LLM_API_KEY ? "Yes" : "No"
+);
 
 connectDB().then(() => {
   const PORT = process.env.PORT || 4000;
+
   const server = http.createServer(app);
 
-  /**const io = new Server(server, {
-    cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-      methods: ['GET', 'POST'],
-    },
-  });*/
-
-  //const onlineUsers = {};
-
-  /**io.on('connection', (socket) => {
-    console.log('⚡ User connected:', socket.id);
-
-    socket.on('join', ({ userId }) => {
-      if (userId) {
-        onlineUsers[userId] = socket.id;
-        console.log(`✅ ${userId} joined (socket: ${socket.id})`);
-      }
-    });
-
-    socket.on('send_message', async (data) => {
-      const { senderId, receiverId, senderRole, receiverRole, text } = data;
-      if (!senderId || !receiverId || !text.trim()) return;
-
-      const message = await Message.create({
-        senderId,
-        receiverId,
-        senderRole,
-        receiverRole,
-        text,
-      });
-
-      if (onlineUsers[receiverId]) {
-        io.to(onlineUsers[receiverId]).emit('receive_message', message);
-      }
-
-      socket.emit('receive_message', message);
-    });
-
-    socket.on('disconnect', () => {
-      for (const id in onlineUsers) {
-        if (onlineUsers[id] === socket.id) {
-          delete onlineUsers[id];
-          console.log(`❌ ${id} disconnected`);
-          break;
-        }
-      }
-    });
-  });**/
-
-  server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  server.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
 });
