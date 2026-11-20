@@ -5,6 +5,7 @@ import "./index.css";
 
 import { Provider } from "react-redux";
 import store from "./redux/store.js";
+import { ConfigProvider } from "antd";
 
 import { Login, SignUp } from "./components/index.js";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
@@ -159,7 +160,36 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
         <Provider store={store}>
-            <RouterProvider router={router} />
+            <ConfigProvider
+                theme={{
+                    token: {
+                        colorPrimary: "#2563eb",
+                        colorInfo: "#2563eb",
+                        colorSuccess: "#16a34a",
+                        colorWarning: "#d97706",
+                        colorError: "#dc2626",
+                        colorText: "#0f172a",
+                        colorTextSecondary: "#64748b",
+                        colorBgLayout: "#f8fafc",
+                        colorBorder: "#e2e8f0",
+                        borderRadius: 12,
+                        fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+                        controlHeight: 40,
+                    },
+                    components: {
+                        Card: {
+                            borderRadiusLG: 20,
+                            headerFontSize: 16,
+                            headerFontSizeSM: 15,
+                        },
+                        Button: {
+                            fontWeight: 600,
+                        },
+                    },
+                }}
+            >
+                <RouterProvider router={router} />
+            </ConfigProvider>
         </Provider>
     </React.StrictMode>
 );

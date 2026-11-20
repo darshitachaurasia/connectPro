@@ -37,7 +37,7 @@ export default function BookingDetails() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 gap-2">
                   <h3 className="text-xl font-semibold text-blue-900">
-                    {service?.serviceName}
+                    {service?.serviceName || "Career Consultation"}
                   </h3>
                   <span
                     className={`px-3 py-1 text-sm font-semibold rounded-full ${
@@ -64,7 +64,7 @@ export default function BookingDetails() {
                     {new Date(dateTime).toLocaleString()}
                   </p>
                   <p>
-                    <strong>Price:</strong> ₹{service?.price}
+                    <strong>Price:</strong> ${booking.price ?? service?.price ?? 0}
                   </p>
                   <Link
                     to="/send-email"
@@ -81,4 +81,3 @@ export default function BookingDetails() {
     </div>
   );
 }
-

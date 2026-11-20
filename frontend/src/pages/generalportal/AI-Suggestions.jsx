@@ -1,24 +1,29 @@
 import React, { useState } from "react";
-
+import { BASE_URL } from "../../const/env.const.js";
 
 const CareerPathAI = () => {
   const [skills, setSkills] = useState("");
   const [suggestions, setSuggestions] = useState([]);
- const API = import.meta.env.VITE_BACKEND_URL;
+  const [error, setError] = useState("");
+
  const handleGenerateSuggestions = async () => {
+  setError("");
   try {
-    const res = await fetch(`${API}/career-suggestions`, {
+    const res = await fetch(`${BASE_URL}/career-suggestions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ skills }),
     });
     const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || data.error || "Failed to fetch career suggestions.");
+    }
 
     // Convert AI text to array (optional)
     const parsed = data.suggestions.split("\n").filter(line => line.trim() !== "");
     setSuggestions(parsed.map(item => ({ title: item, reason: "" })));
   } catch (err) {
-    console.error("Error fetching suggestions", err);
+    setError(err.message || "Error fetching career suggestions.");
   }
 };
 
@@ -45,6 +50,7 @@ const CareerPathAI = () => {
           Get Suggestions
         </button>
       </div>
+      {error && <p role="alert" className="mt-4 text-center text-red-600">{error}</p>}
 
       {/* Suggestions */}
       {suggestions.length > 0 && (

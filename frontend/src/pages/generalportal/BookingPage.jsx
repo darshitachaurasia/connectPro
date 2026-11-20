@@ -10,7 +10,6 @@ import {
   Alert,
   Result,
   Flex,
-  Radio
 } from "antd";
 import {
   VideoCameraOutlined,
@@ -19,7 +18,6 @@ import {
   CreditCardOutlined,
   SafetyCertificateOutlined,
   ArrowLeftOutlined,
-  CheckCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 // --- New Imports ---
@@ -32,22 +30,23 @@ import bookingApi from "../../apiManager/booking";
 import paymentApi from "../../apiManager/payment";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { getToken } from "../../helper";
 
 const { Title, Text, Link } = Typography;
 
 const timeSlots = ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"];
 
 export default function BookingPage() {
-  // Stripe init
-  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
-  // --- New Hooks for Redux & Routing ---
+  const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { mentorId } = useParams(); // Get mentorId from URL
-  const { user } = useSelector((state) => state.auth); // Get user from Redux store
+  const { user, status: authStatus } = useSelector((state) => state.auth);
   const [mentor, setMentor] = useState(null);
   const [services, setServices] = useState([]);
+  const [loadError, setLoadError] = useState("");
 
   // --- State (Unchanged) ---
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -55,104 +54,132 @@ export default function BookingPage() {
   const [selectedService, setSelectedService] = useState(null);
   const [message, setMessage] = useState("");
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState("");
   const [bookedSlots, setBookedSlots] = useState([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [slotsError, setSlotsError] = useState("");
+  const [bookingError, setBookingError] = useState("");
   
-  // --- New Authentication & Data Check Effect ---
   useEffect(() => {
     if (!user) {
+      if (authStatus === "loading" || (getToken() && authStatus !== "failed")) return;
       navigate("/login", { state: { from: location } });
+      return;
     }
+
     const fetchMentor = async () => {
       try {
         const response = await mentorApi.getMentorById(mentorId);
         setMentor(response.data.mentor);
         const activeServices =
-          response.data.mentor.services?.filter((service) => service.active) ||
+          response.data.mentor.services?.filter((service) => service.active).map((service) => ({
+            ...service,
+            name: service.serviceName || service.name,
+          })) ||
           [];
-        setServices(activeServices);
-        if (activeServices.length > 0) {
-          setSelectedService(activeServices[0]);
-        }
+        const availableServices = activeServices.length > 0
+          ? activeServices
+          : [{
+              _id: null,
+              name: "Career Consultation",
+              description: "A focused one-on-one session with your mentor.",
+              duration: 60,
+              price: response.data.mentor.hourlyRate,
+              isDefault: true,
+            }];
+        setServices(availableServices);
+        setSelectedService(availableServices[0]);
       } catch (error) {
-        console.error("Failed to fetch mentor details", error);
+        setLoadError(error.response?.data?.message || "Could not load this mentor's booking details.");
       }
     };
     fetchMentor();
-  }, [user, mentorId, navigate, location]);
+  }, [user, authStatus, mentorId, navigate, location]);
 
   useEffect(() => {
     const fetchBookedSlots = async () => {
-      if (!selectedDate) return;
+      if (!selectedDate || !user) return;
+      setSlotsLoading(true);
+      setSlotsError("");
       try {
         const response = await bookingApi.getBookedSlots(
           mentorId,
           selectedDate.format("YYYY-MM-DD")
         );
         setBookedSlots(response.data.bookedSlots);
+        setSelectedTime((current) =>
+          response.data.bookedSlots.includes(current) ? "" : current
+        );
       } catch (error) {
-        console.error("Failed to fetch booked slots", error);
+        setSlotsError(error.response?.data?.message || "Could not load available times.");
+      } finally {
+        setSlotsLoading(false);
       }
     };
     fetchBookedSlots();
-  }, [selectedDate, mentorId]);
+  }, [selectedDate, mentorId, user]);
 
   const handleNext = () => setStep((prev) => (prev < 3 ? prev + 1 : prev));
   const handlePrevious = () => setStep((prev) => (prev > 1 ? prev - 1 : prev));
 
-  // --- Updated handleBooking function ---
-  const handleBooking = (transactionId) => {
-    // Combine date and time to create a full ISODate string for the backend
+  const handleBooking = async (transactionId) => {
     const timeParts = selectedTime.match(/(\d+):(\d+)\s*(AM|PM)/);
-    if (!timeParts) return; // Or show an error
+    if (!timeParts) {
+      setBookingError("Choose an available appointment time.");
+      return;
+    }
 
     let hours = parseInt(timeParts[1], 10);
     const minutes = parseInt(timeParts[2], 10);
     if (timeParts[3] === 'PM' && hours < 12) hours += 12;
-    if (timeParts[3] === 'AM' && hours === 12) hours = 0; // Midnight case
+    if (timeParts[3] === 'AM' && hours === 12) hours = 0;
 
     const bookingDateTime = selectedDate.hour(hours).minute(minutes).second(0).toISOString();
     
     const bookingPayload = {
-      userId: user._id,
       mentorId: mentorId,
-      service: selectedService,
+      ...(selectedService._id ? { service: selectedService._id } : {}),
       dateTime: bookingDateTime,
       message: message,
       paymentDetails: {
-        method: paymentMethod,
+        method: "stripe",
         amount: finalTotal,
-  transactionId: transactionId || `txn_${Date.now()}` // Use Stripe/Razorpay id if provided
+        transactionId,
       }
     };
 
-    console.log("Dispatching booking:", bookingPayload);
-    // Uncomment the line below when your action is ready
-    dispatch(createBooking(bookingPayload));
-    
-    setStep(4); // Proceed to success screen
+    setBookingError("");
+    try {
+      await dispatch(createBooking(bookingPayload)).unwrap();
+      setStep(4);
+    } catch (error) {
+      setBookingError(
+        typeof error === "string" ? error : error.message || "Payment succeeded, but the booking could not be saved. Please contact support."
+      );
+    }
   };
 
   const handlePrimaryAction = () => {
-    if (step === 2) {
-      if (paymentMethod === 'stripe') return; // Stripe button is inside form
-      handleBooking();
-    } else {
-      handleNext();
-    }
+    if (step === 1) handleNext();
   };
 
   const disabledDate = (current) => {
     const isPastDate = current && current < dayjs().startOf('day');
-    const dayOfWeek = current.day();
-    return isPastDate || dayOfWeek === 0 || dayOfWeek === 6;
+    return isPastDate;
   }
 
-  const canProceedStep1 = selectedDate && selectedTime && selectedService;
-  const canProceedStep2 = paymentMethod;
-  const totalPrice = selectedService ? selectedService.price : 0;
-  const platformFee = Math.round(totalPrice * 0.05);
-  const finalTotal = totalPrice + platformFee;
+  const isPastTime = (time) => {
+    if (!selectedDate.isSame(dayjs(), "day")) return false;
+    const [clock, period] = time.split(" ");
+    let [hours, minutes] = clock.split(":").map(Number);
+    if (period === "PM" && hours < 12) hours += 12;
+    if (period === "AM" && hours === 12) hours = 0;
+    return !selectedDate.hour(hours).minute(minutes).second(0).isAfter(dayjs());
+  };
+
+  const hasSessionRate = Number.isFinite(Number(selectedService?.price)) && Number(selectedService?.price) > 0;
+  const canProceedStep1 = selectedDate && selectedTime && selectedService && hasSessionRate;
+  const totalPrice = hasSessionRate ? Number(selectedService.price) : 0;
+  const finalTotal = totalPrice;
 
   // Inline component for Stripe payment
   const StripeCheckoutForm = ({ amount }) => {
@@ -162,7 +189,7 @@ export default function BookingPage() {
     const [errorMsg, setErrorMsg] = useState("");
 
     const handleStripePay = async () => {
-      if (!stripe || !elements) return;
+      if (!stripe || !elements || !selectedService || !selectedTime) return;
       setProcessing(true);
       setErrorMsg("");
       try {
@@ -172,7 +199,7 @@ export default function BookingPage() {
           metadata: {
             mentorId,
             userId: user?._id,
-            serviceId: selectedService?._id,
+            ...(selectedService?._id ? { serviceId: selectedService._id } : {}),
           },
         });
         if (!intent?.success || !intent?.clientSecret) {
@@ -187,8 +214,7 @@ export default function BookingPage() {
           return;
         }
         if (paymentIntent?.status === 'succeeded') {
-          // Complete booking with Stripe transaction id
-          handleBooking(paymentIntent.id);
+          await handleBooking(paymentIntent.id);
         } else {
           setErrorMsg('Payment not completed.');
         }
@@ -201,22 +227,30 @@ export default function BookingPage() {
 
     return (
       <div className="mt-6">
-        {!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY && (
-          <Alert type="warning" message="Stripe publishable key missing" description="Set VITE_STRIPE_PUBLISHABLE_KEY in your .env to enable Stripe payments." showIcon className="mb-3" />
-        )}
         <div className="p-4 border rounded-md bg-white">
           <CardElement options={{ hidePostalCode: true }} />
         </div>
         {errorMsg && <div className="text-red-500 mt-2 text-sm">{errorMsg}</div>}
         <Button type="primary" className="mt-4" onClick={handleStripePay} disabled={processing || !stripe}>
-          {processing ? 'Processing…' : `Pay $${amount}`}
+          {processing ? 'Processing…' : `Pay $${amount} and book`}
         </Button>
       </div>
     );
   };
 
-  // --- Step 4: Confirmation Screen (Unchanged but now follows a real dispatch) ---
   if (!mentor) {
+    if (loadError) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
+          <Result
+            status="error"
+            title="Booking details unavailable"
+            subTitle={loadError}
+            extra={<Button onClick={() => navigate(-1)}>Go back</Button>}
+          />
+        </div>
+      );
+    }
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 text-blue-700 text-3xl">
         Loading booking page...
@@ -232,7 +266,6 @@ export default function BookingPage() {
           title="Booking Confirmed!"
           subTitle={`Your session with ${mentor.fullname} for ${selectedService.name} on ${selectedDate.format("MMMM D, YYYY")} at ${selectedTime} is booked.`}
           extra={[
-            // These buttons now correctly navigate the user after booking
             <Button type="primary" key="dashboard" onClick={() => navigate("/booking-details")}>Booking Details</Button>,
             <Button key="profile" onClick={() => navigate(`/mentor/${mentorId}`)}>View Mentor Profile</Button>,
           ]}
@@ -242,19 +275,26 @@ export default function BookingPage() {
   }
 
   const renderStepContent = () => {
-    // ...The content of this function (all the JSX for steps 1 and 2) remains the same
-    // For brevity, it's omitted here but should be copied from the previous version.
     switch(step) {
       case 1:
         return (
           <div className="space-y-6">
-            <Card title={<Flex align="center" gap="small"><VideoCameraOutlined /> Select Service</Flex>}>
-              <div className="space-y-4">
+            <Card className="rounded-2xl shadow-sm" title={<Flex align="center" gap="small"><VideoCameraOutlined /> Choose a session</Flex>}>
+              {!hasSessionRate && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  className="mb-4"
+                  message="This mentor has not set a session rate yet"
+                  description="Please choose another mentor or check back later."
+                />
+              )}
+              <div className="grid gap-3 sm:grid-cols-2">
                 {services.map((service) => (
                   <div
                     key={service._id}
                     onClick={() => setSelectedService(service)}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedService?._id === service._id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                    className={`cursor-pointer rounded-xl border p-4 transition-all hover:-translate-y-0.5 hover:shadow-md ${selectedService?._id === service._id ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-100' : 'border-slate-200 bg-white hover:border-blue-300'}`}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -270,30 +310,35 @@ export default function BookingPage() {
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card title={<Flex align="center" gap="small"><CalendarOutlined /> Select Date</Flex>}>
-                <Calendar fullscreen={false} onSelect={setSelectedDate} disabledDate={disabledDate} value={selectedDate} />
+              <Card className="rounded-2xl shadow-sm" title={<Flex align="center" gap="small"><CalendarOutlined /> Select date</Flex>}>
+                <Calendar fullscreen={false} onSelect={(date) => { setSelectedDate(date); setSelectedTime(""); setBookingError(""); setSlotsError(""); }} disabledDate={disabledDate} value={selectedDate} />
               </Card>
-              <Card title={<Flex align="center" gap="small"><ClockCircleOutlined /> Select Time</Flex>}>
-                <div className="flex flex-wrap gap-2">
+              <Card className="rounded-2xl shadow-sm" title={<Flex align="center" gap="small"><ClockCircleOutlined /> Available times</Flex>}>
+                <div className="mb-4 text-sm text-slate-500">{selectedDate.format("dddd, MMMM D")}</div>
+                {slotsError && <Alert className="mb-3" type="error" showIcon message={slotsError} />}
+                {slotsLoading ? <div className="py-8 text-center text-slate-500">Checking availability...</div> : (
+                <div className="grid grid-cols-2 gap-2">
                   {timeSlots.map((time) => {
                     const isBooked = bookedSlots.includes(time);
+                    const isUnavailable = isBooked || isPastTime(time);
                     return (
                       <Button
                         key={time}
                         type={selectedTime === time ? "primary" : "default"}
-                        onClick={() => setSelectedTime(time)}
-                        className="h-12 flex-grow"
-                        disabled={isBooked}
+                        onClick={() => { setSelectedTime(time); setBookingError(""); }}
+                        className="h-11"
+                        disabled={isUnavailable || Boolean(slotsError)}
                       >
-                        {time}
+                        {isBooked ? `${time} · Booked` : isPastTime(time) ? `${time} · Past` : time}
                       </Button>
                     );
                   })}
                 </div>
+                )}
               </Card>
             </div>
             
-            <Card title="Message (Optional)" extra={`To: ${mentor.fullname}`}>
+            <Card className="rounded-2xl shadow-sm" title="Add a note (optional)" extra={`To: ${mentor.fullname}`}>
               <Input.TextArea rows={4} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Tell me about your goals, challenges, or specific topics..."/>
             </Card>
           </div>
@@ -301,50 +346,22 @@ export default function BookingPage() {
       case 2:
         return (
           <div className="space-y-6">
-            <Card title={<Flex align="center" gap="small"><CreditCardOutlined /> Payment Method</Flex>}>
-                <div className="space-y-3">
-                    <div onClick={() => setPaymentMethod('card')} className={`p-4 border rounded-lg cursor-pointer ${paymentMethod === 'card' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
-                        <Flex align="center" gap="middle">
-                           <Radio checked={paymentMethod === 'card'}/>
-                           <div><Text strong>Credit/Debit Card</Text><br/><Text type="secondary">Visa, Mastercard, American Express</Text></div>
-                        </Flex>
-                    </div>
-                    <div onClick={() => setPaymentMethod('razorpay')} className={`p-4 border rounded-lg cursor-pointer ${paymentMethod === 'razorpay' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
-                        <Flex align="center" gap="middle">
-                           <Radio checked={paymentMethod === 'razorpay'}/>
-                           <div><Text strong>Razorpay</Text><br/><Text type="secondary">UPI, Net Banking, Wallets</Text></div>
-                        </Flex>
-                    </div>
-                    <div onClick={() => setPaymentMethod('stripe')} className={`p-4 border rounded-lg cursor-pointer ${paymentMethod === 'stripe' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
-                        <Flex align="center" gap="middle">
-                           <Radio checked={paymentMethod === 'stripe'}/>
-                           <div><Text strong>Stripe</Text><br/><Text type="secondary">Pay securely with card via Stripe</Text></div>
-                        </Flex>
-                    </div>
-                </div>
-
-               {paymentMethod === "card" && (
-                <div className="mt-6 space-y-4">
-                  <hr />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="First Name" />
-                    <Input placeholder="Last Name" />
-                  </div>
-                  <Input placeholder="Card Number" />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="MM/YY" />
-                    <Input placeholder="CVV" />
-                  </div>
-                </div>
-               )}
-
-               {paymentMethod === 'stripe' && (
-                 <Elements stripe={stripePromise}>
-                   <StripeCheckoutForm amount={finalTotal} />
-                 </Elements>
-               )}
+            <Card className="rounded-2xl shadow-sm" title={<Flex align="center" gap="small"><CreditCardOutlined /> Secure card payment</Flex>}>
+                <p className="mb-4 text-sm text-slate-600">Pay securely by card to confirm your session.</p>
+                 {stripePromise ? (
+                   <Elements stripe={stripePromise}>
+                     <StripeCheckoutForm amount={finalTotal} />
+                   </Elements>
+                 ) : (
+                   <Alert
+                     type="error"
+                     showIcon
+                     message="Online booking is temporarily unavailable"
+                     description="Card payments are not configured. Please try again later."
+                   />
+                 )}
             </Card>
-            <Alert message="Secure Payment" description="Your payment information is encrypted and secure." type="success" showIcon icon={<SafetyCertificateOutlined />} />
+            <Alert message="Your card details stay secure" description="Payment is handled securely by Stripe." type="success" showIcon icon={<SafetyCertificateOutlined />} />
           </div>
         );
       default:
@@ -371,52 +388,72 @@ export default function BookingPage() {
 
       <main className="p-6 max-w-6xl mx-auto">
         <div className="mb-8">
-          <Steps current={step - 1} items={[{ title: 'Select Date & Time' }, { title: 'Payment Details' }, { title: 'Confirmation' }]}/>
+          <Steps current={step - 1} items={[{ title: 'Choose a session' }, { title: 'Secure payment' }]}/>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
+            {bookingError && <Alert className="mb-5" type="error" showIcon message={bookingError} />}
             {renderStepContent()}
-            <div className="flex justify-between mt-6">
-              <Button onClick={handlePrevious} disabled={step === 1}>Previous</Button>
-              <Button type="primary" onClick={handlePrimaryAction} disabled={(step === 1 && !canProceedStep1) || (step === 2 && (!canProceedStep2 || paymentMethod === 'stripe'))}>
-                {step === 2 ? "Complete Booking" : "Next"}
-              </Button>
+            <div className="mt-6 flex justify-between">
+              <Button onClick={handlePrevious} disabled={step === 1}>Back</Button>
+              {step === 1 && (
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={handlePrimaryAction}
+                  disabled={!canProceedStep1 || !services.length || slotsLoading || Boolean(slotsError)}
+                >
+                  Continue to payment
+                </Button>
+              )}
             </div>
           </div>
           
           <div className="lg:col-span-1">
             <div className="sticky top-6">
-                <Card title="Booking Summary">
+                <Card className="overflow-hidden rounded-2xl border-0 shadow-xl">
+                  <div className="-mx-6 -mt-6 mb-5 bg-gradient-to-br from-blue-700 to-indigo-800 px-6 py-7 text-white">
+                    <div className="flex items-center gap-4">
+                      <Avatar size={64} src={mentor.profile?.profileImage} className="shrink-0 border-2 border-white/70">
+                        {mentor.fullname?.[0]?.toUpperCase()}
+                      </Avatar>
+                      <div className="min-w-0">
+                        <Text className="block text-xs uppercase tracking-widest text-blue-100">Your mentor</Text>
+                        <Title level={4} className="!mb-0 !mt-1 !text-white">{mentor.fullname}</Title>
+                        {mentor.expertise?.length > 0 && (
+                          <Text className="block truncate text-blue-100">{mentor.expertise.slice(0, 2).join(" · ")}</Text>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                   <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        <Avatar size={64} src={mentor.avatar} />
-                        <div>
-                          <Text strong>{mentor.fullname}</Text>
-                          <Text type="secondary" className="block">{mentor.bio}</Text>
-                        </div>
+                    <div>
+                      <Text type="secondary" className="block text-xs uppercase tracking-wide">Session</Text>
+                      <Text strong>{selectedService?.name || "Choose a session"}</Text>
+                      {selectedService && <Text type="secondary" className="block">{selectedService.duration} minutes</Text>}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <Text type="secondary" className="block text-xs">Date</Text>
+                        <Text strong>{selectedDate.format("MMM D, YYYY")}</Text>
                       </div>
-                      <hr/>
-                      <div className="space-y-2">
-                          {selectedService && <div className="flex justify-between"><Text type="secondary">Service:</Text> <Text strong className="text-right">{selectedService.name}</Text></div>}
-                          {selectedService && <div className="flex justify-between"><Text type="secondary">Duration:</Text> <Text strong>{selectedService.duration} minutes</Text></div>}
-                          {selectedDate && <div className="flex justify-between"><Text type="secondary">Date:</Text> <Text strong>{selectedDate.format("MMM D, YYYY")}</Text></div>}
-                          {selectedTime && <div className="flex justify-between"><Text type="secondary">Time:</Text> <Text strong>{selectedTime}</Text></div>}
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <Text type="secondary" className="block text-xs">Time</Text>
+                        <Text strong>{selectedTime || "Not selected"}</Text>
                       </div>
-                      <hr/>
-                      <div className="space-y-2">
-                         <div className="flex justify-between"><Text type="secondary">Service Fee:</Text> <Text strong>${totalPrice}</Text></div>
-                         <div className="flex justify-between"><Text type="secondary">Platform Fee:</Text> <Text strong>${platformFee}</Text></div>
-                         <hr/>
-                         <div className="flex justify-between items-center"><Title level={4} className="!m-0">Total:</Title> <Title level={4} className="!m-0 !text-blue-600">${finalTotal}</Title></div>
+                    </div>
+                    <div className="border-t border-slate-100 pt-4">
+                      <div className="flex items-center justify-between">
+                        <Text type="secondary">Total</Text>
+                        <Title level={3} className="!m-0 !text-blue-700">${finalTotal}</Title>
                       </div>
-                      <div className="bg-gray-50 p-3 rounded-lg">
-                          <ul className="space-y-1 list-none p-0">
-                            {['HD video call', 'Session recording', 'Follow-up notes', '24/7 support'].map(item => (
-                              <li key={item} className="flex items-center"><CheckCircleOutlined className="text-green-500 mr-2"/><Text type="secondary">{item}</Text></li>
-                            ))}
-                          </ul>
-                      </div>
+                      <Text type="secondary" className="block text-right text-xs">No extra fees</Text>
+                    </div>
+                    <div className="rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                      <SafetyCertificateOutlined className="mr-2" />
+                      Secure payment. Your booking is confirmed after payment.
+                    </div>
                   </div>
                 </Card>
             </div>

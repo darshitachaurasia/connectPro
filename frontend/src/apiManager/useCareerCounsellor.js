@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { BASE_URL } from "../const/env.const.js";
 
 export function useCareerCounsellor() {
   const [career, setCareer] = useState("");
@@ -14,15 +15,16 @@ export function useCareerCounsellor() {
     setError(null);
 
     try {
-      const API = import.meta.env.VITE_BACKEND_URL;
       const response = await axios.post(
-        `${API}/career-guide`,
+        `${BASE_URL}/career-guide`,
         { career: prompt }
       );
 
       setCareer(response.data.guide);
     } catch (err) {
-      setError("Could not generate career guide.");
+      setError(
+        err.response?.data?.message || "Could not generate career guide."
+      );
     } finally {
       setLoading(false);
     }

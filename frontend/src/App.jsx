@@ -5,18 +5,21 @@ import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getCurrentUser } from "./redux/authSlice";
+import { getToken } from "./helper";
 
 function App() {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(getCurrentUser());
+        if (getToken()) {
+            dispatch(getCurrentUser());
+        }
     }, [dispatch]);
     return (
-        <div className="flex flex-wrap content-between min-h-screen bg-white">
-            <div className="w-full block">
+        <div className="app-shell flex min-h-screen flex-col">
+            <div className="flex w-full flex-1 flex-col">
                 <ToastContainer />
                 <Header />
-                <main>
+                <main className="app-main flex-1">
                     <Outlet />
                 </main>
             </div>

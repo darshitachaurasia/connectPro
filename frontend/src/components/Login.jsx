@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../redux/authSlice";
 import { Button, Input, Logo } from "./index";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { register, handleSubmit, watch } = useForm();
   const { user, status, error } = useSelector((state) => state.auth);
@@ -22,24 +23,18 @@ function Login() {
     }
   }, [watch, error, dispatch]);
 
-  const onSubmit = (data) => {
-    dispatch(loginUser(data)).then((res) => {
-      if (res.meta.requestStatus === "fulfilled") {
-        const role = res.payload.role;
-        if (role === "admin") navigate("/admin-login");
-        else if (role === "mentor") navigate("/mentor-login");
-        else if (role === "user") navigate("/user-login");
-      }
-    });
-  };
+  const onSubmit = (data) => dispatch(loginUser(data));
 
   useEffect(() => {
     if (user) {
       if (user.role === "admin") navigate("/admin-login");
       else if (user.role === "mentor") navigate("/mentor-login");
-      else navigate("/user-login");
+      else {
+        const returnPath = location.state?.from?.pathname;
+        navigate(returnPath?.startsWith("/booking-page/") ? returnPath : "/user-login");
+      }
     }
-  }, [user, navigate]);
+  }, [user, navigate, location.state]);
 
   return (
     <div className="flex items-center justify-center w-full min-h-screen bg-gradient-to-br from-blue-800 to-blue-900">

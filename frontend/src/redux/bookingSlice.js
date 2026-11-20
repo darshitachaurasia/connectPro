@@ -22,9 +22,15 @@ export const fetchMentorBookings = createAsyncThunk(
 // Create a new booking
 export const createBooking = createAsyncThunk(
   "booking/create",
-  async (payload) => {
-    const { data } = await bookingApi.createBooking(payload);
-    return data.booking;
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await bookingApi.createBooking(payload);
+      return data.booking;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Failed to create booking"
+      );
+    }
   }
 );
 
@@ -60,7 +66,7 @@ const bookingSlice = createSlice({
         (action) => action.type.startsWith("booking") && action.type.endsWith("/rejected"),
         (state, action) => {
           state.loading = false;
-          state.error = action.error.message;
+          state.error = action.payload || action.error.message;
         }
       );
   },

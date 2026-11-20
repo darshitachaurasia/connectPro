@@ -1,10 +1,9 @@
 import axios from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { setToken } from "../helper";
-
+import { removeToken, setToken } from "../helper";
+import { BASE_URL as API_BASE } from "../const/env.const.js";
 
 export const loginUser = createAsyncThunk("auth/login", async (credentials, thunkAPI) => {
-    const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000/api";
     try {
         const response = await axios.post(
             `${API_BASE}/auth/login`,
@@ -53,7 +52,7 @@ export const getCurrentUser = createAsyncThunk("auth/getCurrentUser", async (_, 
     try {
         const token = getToken();
         const response = await axios.get(
-            `${API_BASE}/api/user/profile`,
+            `${API_BASE}/user/profile`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -67,6 +66,9 @@ export const getCurrentUser = createAsyncThunk("auth/getCurrentUser", async (_, 
         }
         return data.data || null;
     } catch (error) {
+        if (error.response?.status === 401) {
+            removeToken();
+        }
         if (error.response && error.response.data) {
             return thunkAPI.rejectWithValue(error.response.data.message || "Not authenticated");
         }
