@@ -2,7 +2,7 @@
 import { Button } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '../redux/authSlice';
+import { logoutUser } from '../../redux/authSlice';
 import { useNavigate } from 'react-router-dom';
 
 

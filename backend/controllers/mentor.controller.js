@@ -1,6 +1,6 @@
-import ApiError from "../utils/ApiError.js";
+import ApiError from "../utils/http/ApiError.js";
 import * as mentorService from "../services/mentor.service.js";
-import httpStatus from "../utils/httpStatus.js";
+import httpStatus from "../utils/http/httpStatus.js";
 import mongoose from "mongoose";
 
 export const getAllMentors = async (req, res, next) => {

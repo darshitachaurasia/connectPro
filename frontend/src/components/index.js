@@ -1,13 +1,13 @@
 
-import Header from './Header'
-import Logo from './Logo'
+import Header from './layout/Header'
+import Logo from './layout/Logo'
 
-import LogoutBtn from './LogoutBtn'
-import Login from './Login'
-import SignUp from './SignUp'
+import LogoutBtn from './auth/LogoutBtn'
+import Login from './auth/Login'
+import SignUp from './auth/SignUp'
 
-import Input from './Input'
-import Button from './Button'
+import Input from './ui/Input'
+import Button from './ui/Button'
 
 
 export {

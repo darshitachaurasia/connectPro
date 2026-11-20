@@ -1,5 +1,5 @@
-import httpStatus from "../utils/httpStatus.js";
-import ApiError from "../utils/ApiError.js";
+import httpStatus from "../utils/http/httpStatus.js";
+import ApiError from "../utils/http/ApiError.js";
 import serviceService from "../services/service.service.js";
 
 const createService = async (req, res, next) => {

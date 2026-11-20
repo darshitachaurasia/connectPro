@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { fetchUserProfile, updateUserProfile, rateMentor, updateProfilePicture } from "../../redux/userSlice";
-import { getCurrentUser, sendOtp } from "../../redux/authSlice";
-import { Button } from "../../components";
+import { fetchUserProfile, updateUserProfile, rateMentor, updateProfilePicture } from "../../../redux/userSlice";
+import { getCurrentUser, sendOtp } from "../../../redux/authSlice";
+import { Button } from "../../../components/index.js";
 import { useNavigate } from "react-router-dom";
 
 export default function UserProfilePage() {

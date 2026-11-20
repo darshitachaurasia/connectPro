@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { sendOtp, verifyOtp, getCurrentUser } from "../../redux/authSlice";
-import { Button } from "../../components";
+import { sendOtp, verifyOtp, getCurrentUser } from "../../../redux/authSlice";
+import { Button } from "../../../components/index.js";
 import { useNavigate } from "react-router-dom";
 
 export default function VerifyEmail() {

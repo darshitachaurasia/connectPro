@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import LearnVideo from '../../components/LearnVideo';
+import LearnVideo from '../../../components/LearnVideo';
 import LearnArticle from './LearnArticle';
 import LearnCategoryTabs from './LearnCategoryTabs';
 

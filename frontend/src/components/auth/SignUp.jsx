@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Input, Logo } from "./index";
+import { Button, Input, Logo } from "../index";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { signUpUser } from "../redux/authSlice";
+import { signUpUser } from "../../redux/authSlice";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 

@@ -1,5 +1,5 @@
 
-import connectPro from './logo.png'
+import connectPro from '../../assets/branding/logo.png'
 function Logo({ width = "140px" }) {
   return (
     <div className="flex h-auto items-center justify-center">

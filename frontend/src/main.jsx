@@ -10,38 +10,38 @@ import { ConfigProvider } from "antd";
 import { Login, SignUp } from "./components/index.js";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-import LandingPage from "./pages/generalportal/LandingPage.jsx";
-import UserProfile from "./pages/generalportal/UserProfile.jsx";
-import VerifyEmail from "./pages/generalportal/VerifyEmail.jsx";
-import ServicesPage from "./pages/generalportal/ServicesPage.jsx";
+import LandingPage from "./pages/user/home/LandingPage.jsx";
+import UserProfile from "./pages/user/account/UserProfile.jsx";
+import VerifyEmail from "./pages/user/account/VerifyEmail.jsx";
+import ServicesPage from "./pages/user/mentorship/ServicesPage.jsx";
 
-import UserSignUp from "./pages/generalportal/UserSignUp.jsx";
+import UserSignUp from "./pages/user/account/UserSignUp.jsx";
 
-import UserManagementPage from "./pages/adminPortal/UserManagementPage.jsx";
-import MentorManagement from "./pages/adminPortal/MentorManagement.jsx";
-import BookingDetails from "./pages/generalportal/BookingDetails";
-import TopMentors from "./components/TopMentors.jsx";
+import UserManagementPage from "./pages/admin/UserManagementPage.jsx";
+import MentorManagement from "./pages/admin/MentorManagement.jsx";
+import BookingDetails from "./pages/user/bookings/BookingDetails";
+import TopMentors from "./components/mentorship/TopMentors.jsx";
 
-import UserDashboard from "./pages/generalportal/UserDashboard.jsx";
-import MentorDashboard from "./pages/mentorPortal/MentorDashboard.jsx";
-import AdminDashboard from "./pages/adminPortal/AdminDashboard.jsx";
+import UserDashboard from "./pages/user/account/UserDashboard.jsx";
+import MentorDashboard from "./pages/mentor/MentorDashboard.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 
 
-import BookingPage from "./pages/generalportal/BookingPage.jsx";
-import MentorDetails from "./pages/generalportal/MentorDetails.jsx";
-import BookingManagement from "./pages/adminPortal/BookingManagement.jsx";
+import BookingPage from "./pages/user/bookings/BookingPage.jsx";
+import MentorDetails from "./pages/user/mentorship/MentorDetails.jsx";
+import BookingManagement from "./pages/admin/BookingManagement.jsx";
 
-import LearnHeader from "./pages/generalportal/Learn.jsx";
-import EmailSender from "./components/EmailSender.jsx";
-import MentorServices from "./pages/mentorPortal/MentorServices.jsx";
-import MentorBookings from "./pages/mentorPortal/MentorBookings.jsx";
-import MentorsPage from "./pages/generalportal/MentorsList.jsx";
-import CareerTestBanner from "./pages/generalportal/CareerTestBanner.jsx";
-import CareerChat from "./pages/generalportal/AIChat.jsx";
-import CareerCounsellingQuiz from "./pages/generalportal/CareerQuiz.jsx";
-import CareerPathAI from "./pages/generalportal/AI-Suggestions.jsx";
-import Counsellor from "./pages/generalportal/Counsellor.jsx";
-import MentorChat from "./components/MentorChat.jsx";
+import LearnHeader from "./pages/user/learning/Learn.jsx";
+import EmailSender from "./pages/user/account/EmailSender.jsx";
+import MentorServices from "./pages/mentor/MentorServices.jsx";
+import MentorBookings from "./pages/mentor/MentorBookings.jsx";
+import MentorsPage from "./pages/user/mentorship/MentorsList.jsx";
+import CareerTestBanner from "./pages/user/career/CareerTestBanner.jsx";
+import CareerChat from "./pages/user/career/AIChat.jsx";
+import CareerCounsellingQuiz from "./pages/user/career/CareerQuiz.jsx";
+import CareerPathAI from "./pages/user/career/AI-Suggestions.jsx";
+import Counsellor from "./pages/user/career/Counsellor.jsx";
+import MentorChat from "./components/communication/MentorChat.jsx";
 
 
 const router = createBrowserRouter([

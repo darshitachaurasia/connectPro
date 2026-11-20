@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUserBookings } from "../../redux/bookingSlice";
+import { fetchUserBookings } from "../../../redux/bookingSlice";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom"; // ✅ Import Link
 

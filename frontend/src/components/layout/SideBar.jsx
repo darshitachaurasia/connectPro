@@ -17,7 +17,7 @@ import {
 } from "@ant-design/icons";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import LogoutBtn from "./LogoutBtn";
+import LogoutBtn from "../auth/LogoutBtn";
 
 const publicLinks = [
   { name: "Home", path: "/", icon: HomeOutlined },

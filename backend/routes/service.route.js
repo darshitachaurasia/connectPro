@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as serviceController from "../controllers/service.controller.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/http/asyncHandler.js";
 import verifyJWT from "../middlewares/auth.js";  // ✅ Updated import
 
 const serviceRouter = Router();

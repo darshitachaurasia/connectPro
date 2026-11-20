@@ -24,13 +24,13 @@ import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import mentorApi from "../../apiManager/mentor";
-import { createBooking } from "../../redux/bookingSlice";
-import bookingApi from "../../apiManager/booking";
-import paymentApi from "../../apiManager/payment";
+import mentorApi from "../../../apiManager/mentor";
+import { createBooking } from "../../../redux/bookingSlice";
+import bookingApi from "../../../apiManager/booking";
+import paymentApi from "../../../apiManager/payment";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { getToken } from "../../helper";
+import { getToken } from "../../../helper/index.js";
 
 const { Title, Text, Link } = Typography;
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import mentorApi from '../../apiManager/mentor';
+import mentorApi from '../../../apiManager/mentor';
 
 function MentorDetails() {
   const { id } = useParams();

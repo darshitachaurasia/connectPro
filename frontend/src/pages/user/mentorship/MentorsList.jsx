@@ -28,8 +28,8 @@ const { Option } = Select;
 const { Title, Text, Paragraph } = Typography;
 
 import { useEffect } from "react";
-import mentorApi from "../../apiManager/mentor";
-import useMentorStore from "../../redux/mentors";
+import mentorApi from "../../../apiManager/mentor";
+import useMentorStore from "../../../redux/mentors";
 
 export default function MentorsPage() {
   const mentors = useMentorStore((state) => state.mentorsData);

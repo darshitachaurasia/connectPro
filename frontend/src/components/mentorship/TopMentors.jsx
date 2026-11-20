@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import useMentorStore from "../redux/mentors";
-import mentorApi from "../apiManager/mentor";
+import useMentorStore from "../../redux/mentors";
+import mentorApi from "../../apiManager/mentor";
 import MentorCard from "./MentorCard";
 import { Button, Spin } from "antd";
 

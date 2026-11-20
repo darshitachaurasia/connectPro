@@ -17,8 +17,8 @@ import mentorRouter from "./routes/mentor.route.js";
 import serviceRouter from "./routes/service.route.js";
 import bookingRouter from "./routes/booking.routes.js";
 import paymentRouter from "./routes/payment.route.js";
-import ApiError from "./utils/ApiError.js";
-import asyncHandler from "./utils/asyncHandler.js";
+import ApiError from "./utils/http/ApiError.js";
+import asyncHandler from "./utils/http/asyncHandler.js";
 
 const app = express();
 

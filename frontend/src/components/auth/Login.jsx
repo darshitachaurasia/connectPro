@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { loginUser } from "../redux/authSlice";
-import { Button, Input, Logo } from "./index";
+import { loginUser } from "../../redux/authSlice";
+import { Button, Input, Logo } from "../index";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 

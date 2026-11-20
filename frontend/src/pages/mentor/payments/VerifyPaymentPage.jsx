@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
-import { verifyPayment } from "../../apiManger/booking";
+import { verifyPayment } from "../../../apiManger/booking";
 
 const VerifyPaymentPage = () => {
   const location = useLocation();

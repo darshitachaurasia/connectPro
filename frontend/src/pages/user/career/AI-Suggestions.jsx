@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BASE_URL } from "../../const/env.const.js";
+import { BASE_URL } from "../../../const/env.const.js";
 
 const CareerPathAI = () => {
   const [skills, setSkills] = useState("");

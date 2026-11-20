@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Input, Modal, Form, Spin } from "antd";
 import toast from "react-hot-toast";
 import { FiPlus } from "react-icons/fi";
-import ServiceCard from "../../components/ServiceCard";
+import ServiceCard from "../../components/mentorship/ServiceCard";
 import apiService from "../../apiManager/service";
 import { useSelector } from "react-redux";
 

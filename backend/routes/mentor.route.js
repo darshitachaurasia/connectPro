@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as mentorController from "../controllers/mentor.controller.js";
-import asyncHandler from "../utils/asyncHandler.js"
+import asyncHandler from "../utils/http/asyncHandler.js"
 
 const mentorRouter = Router();
 

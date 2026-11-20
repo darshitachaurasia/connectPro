@@ -1,9 +1,9 @@
-import asyncHandler from "../utils/asyncHandler.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import asyncHandler from "../utils/http/asyncHandler.js";
+import { ApiResponse } from "../utils/http/ApiResponse.js";
 import  User from "../models/user.model.js";
-import httpStatus from "../utils/httpStatus.js";
-import ApiError from "../utils/ApiError.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import httpStatus from "../utils/http/httpStatus.js";
+import ApiError from "../utils/http/ApiError.js";
+import { uploadOnCloudinary } from "../utils/uploads/cloudinary.js";
 
 // This endpoint returns the current authenticated user if the access token cookie is valid
 const getCurrentUser = asyncHandler(async (req, res) => {

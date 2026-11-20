@@ -1,8 +1,8 @@
-import asyncHandler from "../utils/asyncHandler.js";
-import ApiError from "../utils/ApiError.js";
+import asyncHandler from "../utils/http/asyncHandler.js";
+import ApiError from "../utils/http/ApiError.js";
 import  User from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
+import { uploadOnCloudinary } from "../utils/uploads/cloudinary.js";
+import { ApiResponse } from "../utils/http/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import crypto from "crypto";

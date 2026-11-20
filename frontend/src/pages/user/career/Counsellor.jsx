@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Layout, Typography, Input, Button, Card, Spin, Alert } from "antd";
-import { useCareerCounsellor} from "../../apiManager/useCareerCounsellor"
+import { useCareerCounsellor} from "../../../apiManager/useCareerCounsellor"
 import ReactMarkdown from "react-markdown";
 
 const { Title } = Typography;
