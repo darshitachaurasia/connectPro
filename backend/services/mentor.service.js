@@ -23,13 +23,13 @@ export const getAllMentors = async (filters) => {
 
     const mentors = await UserModel.find(query).select("-password -__v -refreshToken -otp -otpExpiry").lean();
     for (let mentor of mentors) {
-        const services = await ServiceModel.find({ mentor: mentor._id, }).select("name description price duration active");
+        const services = await ServiceModel.find({ mentor: mentor._id }).select("serviceName description price duration active");
         mentor.services = services;
     }
     
     // Ensure _id is a string for reliable use on the frontend.
     const mentorsWithIdAsString = mentors.map(mentor => {
-        return { ...mentor, _id: mentor._id.toString() };
+        return { ...mentor, _id: mentor._id.toString(), availability: "24/7" };
     });
 
     return mentorsWithIdAsString;
@@ -38,10 +38,11 @@ export const getAllMentors = async (filters) => {
 export const getMentorById = async (id) => {
     const mentor = await UserModel.findOne({ _id: id, role: "mentor" }).select("-password -__v -refreshToken -otp -otpExpiry").lean();
     if (mentor) {
-        const services = await ServiceModel.find({ mentor: id,}).select("name description price duration active");
+        const services = await ServiceModel.find({ mentor: id }).select("serviceName description price duration active");
         mentor.services = services;
         mentor.experience = "5+ years";
         mentor.price = mentor.hourlyRate;
+        mentor.availability = "24/7";
     }
     return mentor;
 };
@@ -49,6 +50,7 @@ export const getMentorById = async (id) => {
 export const getMentorByUsername = async (username) => {
     const mentor = await UserModel.findOne({ username, role: "mentor" }).select("-password -__v -refreshToken -otp -otpExpiry");
     if (!mentor) return null;
+    mentor.availability = "24/7";
     return mentor;
 };
 

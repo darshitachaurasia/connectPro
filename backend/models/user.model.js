@@ -83,6 +83,7 @@ const userSchema = new mongoose.Schema(
         },
         availability: {
             type: String,
+            default: "24/7",
         },
     },
     {

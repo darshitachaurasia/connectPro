@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, "./.env") });
 
 console.log(
-  "🔑 Loaded LLM_API_KEY?",
-  process.env.LLM_API_KEY ? "Yes" : "No"
+  "🔑 Loaded AI provider API key?",
+  process.env.NVIDIA_API_KEY || process.env.LLM_API_KEY ? "Yes" : "No"
 );
 
 connectDB().then(() => {
